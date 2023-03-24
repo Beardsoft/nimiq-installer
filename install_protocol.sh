@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Set default values
-username=${1:-protocol}
-docker_group=${2:-docker}
+username="protocol"
+network=${1:-devnet}
+node_type=${2:-full_node}
 
 # Check if the script is running as root
 if [[ $(id -u) -ne 0 ]]; then
@@ -25,8 +26,8 @@ fi
 apt-get update && apt-get upgrade -y
 
 # Check if the protocol user is already in the docker group, and add it if it's not
-if ! id -nG $username | grep -qw $docker_group; then
-    usermod -aG $docker_group $username
+if ! id -nG $username | grep -qw docker; then
+    usermod -aG docker $username
 fi
 
 # Install Docker and Docker Compose
@@ -48,11 +49,40 @@ if [ ! -d "/opt/nimiq/secrets" ]; then
     mkdir -p /opt/nimiq/secrets
 fi
 
+# Download config files
+if [ "$network" == "devnet" ]; then
+    curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/config/devnet-config.toml -o /opt/nimiq/configuration/config.toml
+elif [ "$network" == "testnet" ]; then
+    curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/config/testnet-config.toml -o /opt/nimiq/configuration/config.toml
+else
+    echo "Invalid network parameter. Please use devnet or testnet."
+    exit 1
+fi
+
+curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/Docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
+
 # Set permissions for the directories
-chown -R $username:$username /opt/nimiq/configuration /opt/nimiq/data /opt/nimiq/secrets
+chown -R $username:docker /opt/nimiq/configuration /opt/nimiq/data /opt/nimiq/secrets
 chmod -R 750 /opt/nimiq/configuration
 chmod -R 755 /opt/nimiq/data
 chmod -R 740 /opt/nimiq/secrets
+
+# Set the RPC_ENABLED environment variable based on the node type
+if [ "$node_type" == "full_node" ]; then
+    rpc_enabled=true
+elif [ "$node_type" == "validator" ]; then
+    rpc_enabled=false
+else
+    echo "Invalid node_type parameter. Please use full_node or validator."
+    exit 1
+fi
+
+# Create the environment file with the RPC_ENABLED variable
+cat > /opt/nimiq/configuration/env_file <<EOF
+RPC_ENABLED=$rpc_enabled
+EOF
+
+docker-compose -f /opt/nimiq/configuration/docker-compose.yaml up -d
 
 # Print a message indicating that the script has finished
 echo "The script has finished."

@@ -1,21 +1,44 @@
 version: '3'
+
 services:
   node:
     container_name: node
     image: maestroi/nimiq-albatross:latest
     restart: unless-stopped
-    ports:
-      - "8649:8649"
-      - "8443:8443"
-      - "8648:8648"
-      - "9101:9101"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.node.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.node.entrypoints=http"
+      - "traefik.http.services.node.loadbalancer.server.port=8648"
     environment:
       RPC_ENABLED: "true"
       NIMIQ_INSTANT_INBOUND: "true"
     volumes:
-      - /opt/nimiq/configuration/client.toml:/home/nimiq/.nimiq/client.toml"
+      - "/opt/nimiq/client.toml:/home/nimiq/.nimiq/client.toml"
     networks:
-      - "app_net"
+      - app_net
+
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    restart: always
+    command: --interval 1800 node
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - app_net
+
+  traefik:
+    container_name: traefik
+    image: traefik:v2.9.9
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - app_net
+
 networks:
-  "app_net":
+  app_net:
     driver: bridge
