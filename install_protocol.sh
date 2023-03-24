@@ -44,7 +44,7 @@ apt-get install -y docker.io docker-compose
 
 # Install some common packages
 echo -e "${GREEN}Installing common packages.${NC}"
-apt-get install -y curl git vim
+apt-get install -y curl git ufw
 
 # Check if the directories already exist, and create them if they don't
 if [ ! -d "/opt/nimiq/configuration" ]; then
@@ -102,9 +102,21 @@ else
     sed -i 's/^RPC_ENABLED=./RPC_ENABLED=false/' /opt/nimiq/configuration/env_file
 fi
 
+# Add firewall rules to allow incoming traffic on ports 80, 22, and 8443
+echo -e "${GREEN}Adding firewall rules.${NC}"
+ufw allow 80/tcp
+ufw allow 22/tcp
+ufw allow 8443/tcp
+ufw enable
+
+# Add firewall rules to allow incoming traffic on port 8443 (UDP)
+echo -e "${GREEN}Adding firewall rules (UDP).${NC}"
+ufw allow 8443/udp
+
 # Run the Docker container using Docker Compose
 echo -e "${GREEN}Starting Docker container.${NC}"
 su - $username -c "cd /opt/nimiq/configuration && docker-compose up -d"
+
 
 # Print a message indicating that the script has finished
 echo -e "${GREEN}The script has finished.${NC}"
