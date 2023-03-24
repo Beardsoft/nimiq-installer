@@ -3,7 +3,6 @@
 # Set default values
 username="protocol"
 protocol_uid=7200
-protocol_gid=7200
 network=${1:-devnet}
 node_type=${2:-full_node}
 
@@ -24,16 +23,24 @@ if [[ $(lsb_release -si) != "Ubuntu" ]]; then
     exit 1
 fi
 
+
+# Create the protocol group with the specified GID (if it does not already exist)
+if ! getent group $protocol_uid &>/dev/null; then
+    echo -e "${GREEN}Creating user: $protocol_uid.${NC}"
+    groupadd -r -g $protocol_uid $username
+fi
+
 # Check if the user protocol exists, and create it if it doesn't
 if ! id -u $username > /dev/null 2>&1; then
     echo -e "${GREEN}Creating user: $username.${NC}"
-    id -u $username &>/dev/null || useradd -r -m -u $protocol_uid -g $protocol_gid -s /usr/sbin/nologin $username
+    id -u $username &>/dev/null || useradd -r -m -u $protocol_uid -g $protocol_uid -s /usr/sbin/nologin $username
 
 fi
 
 # Update and upgrade Ubuntu
 echo -e "${GREEN}Updating and upgrading Ubuntu.${NC}"
-apt-get update && apt-get upgrade -y
+apt-get update &>/dev/null
+apt-get upgrade -y &>/dev/null
 
 # Check if the protocol user is already in the docker group, and add it if it's not
 if ! id -nG $username | grep -qw docker; then
@@ -43,11 +50,11 @@ fi
 
 # Install Docker and Docker Compose
 echo -e "${GREEN}Installing Docker and Docker Compose.${NC}"
-apt-get install -y docker.io docker-compose
+apt-get install -y docker.io docker-compose &>/dev/null
 
 # Install some common packages
 echo -e "${GREEN}Installing common packages.${NC}"
-apt-get install -y curl git ufw
+apt-get install -y curl git ufw &>/dev/null
 
 # Check if the directories already exist, and create them if they don't
 if [ ! -d "/opt/nimiq/configuration" ]; then
@@ -82,7 +89,7 @@ curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/Docker
 
 # Set permissions for the directories
 echo -e "${GREEN}Setting permissions for directories.${NC}"
-chown -R $username:$username /opt/nimiq/configuration /opt/nimiq/data /opt/nimiq/secrets
+chown -R $protocol_uid:$protocol_uid /opt/nimiq/configuration /opt/nimiq/data /opt/nimiq/secrets
 chmod -R 750 /opt/nimiq/configuration
 chmod -R 755 /opt/nimiq/data
 chmod -R 740 /opt/nimiq/secrets
