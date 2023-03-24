@@ -107,7 +107,9 @@ echo -e "${GREEN}Adding firewall rules.${NC}"
 ufw allow 80/tcp
 ufw allow 22/tcp
 ufw allow 8443/tcp
-ufw enable
+
+echo -e "${GREEN}Enabling ufw.${NC}"
+echo "y" | ufw enable > /dev/null
 
 # Add firewall rules to allow incoming traffic on port 8443 (UDP)
 echo -e "${GREEN}Adding firewall rules (UDP).${NC}"
