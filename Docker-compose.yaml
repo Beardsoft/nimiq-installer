@@ -1,0 +1,21 @@
+version: '3'
+services:
+  node:
+    container_name: node
+    image: maestroi/nimiq-albatross:latest
+    restart: unless-stopped
+    ports:
+      - "8649:8649"
+      - "8443:8443"
+      - "8648:8648"
+      - "9101:9101"
+    environment:
+      RPC_ENABLED: "true"
+      NIMIQ_INSTANT_INBOUND: "true"
+    volumes:
+      - /opt/nimiq/configuration/client.toml:/home/nimiq/.nimiq/client.toml"
+    networks:
+      - "app_net"
+networks:
+  "app_net":
+    driver: bridge

@@ -1,6 +1,6 @@
 #cloud-config
 
 runcmd:
-  - curl -fsSL https://example.com/install_protocol.sh -o install_protocol.sh
+  - curl -fsSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/install_protocol.sh -o install_protocol.sh
   - chmod +x install_protocol.sh
   - sudo ./install_protocol.sh
