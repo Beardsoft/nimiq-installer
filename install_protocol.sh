@@ -2,6 +2,8 @@
 
 # Set default values
 username="protocol"
+protocol_uid=7200
+protocol_gid=7200
 network=${1:-devnet}
 node_type=${2:-full_node}
 
@@ -25,7 +27,8 @@ fi
 # Check if the user protocol exists, and create it if it doesn't
 if ! id -u $username > /dev/null 2>&1; then
     echo -e "${GREEN}Creating user: $username.${NC}"
-    useradd -m $username
+    id -u $username &>/dev/null || useradd -r -m -u $protocol_uid -g $protocol_gid -s /usr/sbin/nologin $username
+
 fi
 
 # Update and upgrade Ubuntu
@@ -117,8 +120,7 @@ ufw allow 8443/udp
 
 # Run the Docker container using Docker Compose
 echo -e "${GREEN}Starting Docker container.${NC}"
-su - $username -c "cd /opt/nimiq/configuration && docker-compose up -d"
-
+cd /opt/nimiq/configuration && docker-compose up -d
 
 # Print a message indicating that the script has finished
 echo -e "${GREEN}The script has finished.${NC}"
