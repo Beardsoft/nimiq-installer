@@ -3,7 +3,7 @@ version: '3'
 services:
   node:
     container_name: node
-    image: maestroi/nimiq-albatross:latest
+    image: maestroi/nimiq-albatross:stable
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -14,7 +14,7 @@ services:
       RPC_ENABLED: "true"
       NIMIQ_INSTANT_INBOUND: "true"
     volumes:
-      - "/opt/nimiq/client.toml:/home/nimiq/.nimiq/client.toml"
+      - "/opt/nimiq/configuration/config.toml:/home/nimiq/.nimiq/client.toml"
     networks:
       - app_net
 
