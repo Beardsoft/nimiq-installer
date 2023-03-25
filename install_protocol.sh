@@ -34,19 +34,19 @@ fi
 
 # Create the protocol group with the specified GID (if it does not already exist)
 if ! getent group $protocol_uid &>/dev/null; then
-    echo -e "${GREEN}Creating user: $protocol_uid.${NC}"
+    echo -e "${GREEN}Creating group: $protocol_uid.${NC}"
     groupadd -r -g $protocol_uid $username
 fi
 
 # Check if the user protocol exists, and create it if it doesn't
 if ! id -u $username > /dev/null 2>&1; then
-    echo -e "${GREEN}Creating user: $username.${NC}"
+    echo -e "${GREEN}Creating user: $username with ID: $protocol_uid .${NC}"
     id -u $username &>/dev/null || useradd -r -m -u $protocol_uid -g $protocol_uid -s /usr/sbin/nologin $username
 
 fi
 
 # Update and upgrade Ubuntu
-echo -e "${GREEN}Updating and upgrading Ubuntu.${NC}"
+echo -e "${GREEN}Updating and upgrading Ubuntu, may take a while....${NC}"
 apt-get update &>/dev/null
 apt-get upgrade -y &>/dev/null
 
@@ -134,7 +134,12 @@ echo -e "${GREEN}UFW configured successfully.${NC}"
 
 # Run the Docker container using Docker Compose
 echo -e "${GREEN}Starting Docker container.${NC}"
-cd /opt/nimiq/configuration && docker-compose up -d
+cd /opt/nimiq/configuration && docker-compose up -d &>/dev/null
+echo -e "${GREEN}-----------------${NC}"
+echo -e "${GREEN}To restart containers navigate /opt/nimiq/configuration ${NC}"
+echo -e "${GREEN}and run docker-compose restart ${NC}"
+echo -e "${GREEN}Follow logs with docker-compose logs ${NC}"
+echo -e "${GREEN}-----------------${NC}"
 
 # Print a message indicating that the script has finished
 echo -e "${GREEN}Leave a star at: https://github.com/maestroi/nimiq-installer ${NC}"
