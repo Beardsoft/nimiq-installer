@@ -15,7 +15,7 @@ services:
       RPC_ENABLED: "true"
       NIMIQ_INSTANT_INBOUND: "true"
     volumes:
-      - "/opt/nimiq/configuration/config.toml:/home/nimiq/.nimiq/client.toml"
+      - "/opt/nimiq/configuration/client.toml:/home/nimiq/.nimiq/client.toml"
     networks:
       - app_net
 
