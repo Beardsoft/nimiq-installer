@@ -11,15 +11,14 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-
-echo -e "${GREEN}  _   _ _           _         _____           _        _ _           ${NC}";
-echo -e "${GREEN} | \ | (_)         (_)       |_   _|         | |      | | |          ${NC}";
-echo -e "${GREEN} |  \| |_ _ __ ___  _  __ _    | |  _ __  ___| |_ __ _| | | ___ _ __ ${NC}";
-echo -e "${GREEN} \| . \` \| \| '_ \` _ \\| \| \\/\` \\ \|   \| \| \| '_ \\/ __\| __/ \` \\ \| \| \\/\` \\ \\|__${NC}";
-echo -e "${GREEN} \| \|\ \  \| \| \| \| \| \| \(_\| \|  \_\| \|\ \__ \ \\|\\ \(_\| \| \| \|\ \_ \ \|   ${NC}";
-echo -e "${GREEN} \|_\| \_\|\|\_\|\|\_\|\|\_\|_\\__, \| \|_____\|\|_\|\|_\|___/\\_\\__\\__,_\|\|_\|\_\|\\\___\|\|_\|   ${NC}";
-echo -e "${GREEN}                         | |                                         ${NC}";
-echo -e "${GREEN}                         |_|                                         ${NC}";
+echo -n $'\033[0;32m'
+echo $''
+echo $'     _  __ _         _         ____           __         __ __          '
+echo $'    / |/ /(_)__ _   (_)___ _  /  _/___   ___ / /_ ___ _ / // /___  ____ '
+echo $'   /    // //  " \ / // _ `/ _/ / / _ \ (_-</ __// _ `// // // -_)/ __/ '
+echo $'  /_/|_//_//_/_/_//_/ \_, / /___//_//_//___/\__/ \_,_//_//_/ \__//_/    '
+echo $'                       /_/                                              '
+echo $' \033[0m';
 
 # Check if the script is running as root
 if [[ $(id -u) -ne 0 ]]; then
@@ -32,7 +31,6 @@ if [[ $(lsb_release -si) != "Ubuntu" ]]; then
     echo -e "${YELLOW}This script is only compatible with Ubuntu.${NC}"
     exit 1
 fi
-
 
 # Create the protocol group with the specified GID (if it does not already exist)
 if ! getent group $protocol_uid &>/dev/null; then
@@ -139,5 +137,5 @@ echo -e "${GREEN}Starting Docker container.${NC}"
 cd /opt/nimiq/configuration && docker-compose up -d
 
 # Print a message indicating that the script has finished
-echo -e "${GREEN}Leave a star at: https://github.com/maestroi/nimiq-installe.${NC}"
+echo -e "${GREEN}Leave a star at: https://github.com/maestroi/nimiq-installer ${NC}"
 echo -e "${GREEN}The script has finished.${NC}"
