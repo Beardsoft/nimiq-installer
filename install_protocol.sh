@@ -2,7 +2,7 @@
 
 # Set default values
 username="protocol"
-protocol_uid=7200
+protocol_uid=1001
 network=${1:-devnet}
 node_type=${2:-full_node}
 
@@ -10,6 +10,16 @@ node_type=${2:-full_node}
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
+
+
+echo -e "${GREEN}  _   _ _           _         _____           _        _ _           ${NC}";
+echo -e "${GREEN} | \ | (_)         (_)       |_   _|         | |      | | |          ${NC}";
+echo -e "${GREEN} |  \| |_ _ __ ___  _  __ _    | |  _ __  ___| |_ __ _| | | ___ _ __ ${NC}";
+echo -e "${GREEN} | . ` | | '_ ` _ \| |/ _` |   | | | '_ \/ __| __/ _` | | |/ _ \ '__|${NC}";
+echo -e "${GREEN} | |\  | | | | | | | | (_| |  _| |_| | | \__ \ || (_| | | |  __/ |   ${NC}";
+echo -e "${GREEN} |_| \_|_|_| |_| |_|_|\__, | |_____|_| |_|___/\__\__,_|_|_|\___|_|   ${NC}";
+echo -e "${GREEN}                         | |                                         ${NC}";
+echo -e "${GREEN}                         |_|                                         ${NC}";
 
 # Check if the script is running as root
 if [[ $(id -u) -ne 0 ]]; then
@@ -42,19 +52,19 @@ echo -e "${GREEN}Updating and upgrading Ubuntu.${NC}"
 apt-get update &>/dev/null
 apt-get upgrade -y &>/dev/null
 
-# Check if the protocol user is already in the docker group, and add it if it's not
-if ! id -nG $username | grep -qw docker; then
-    echo -e "${GREEN}Adding user $username to the docker group.${NC}"
-    usermod -aG docker $username
-fi
-
 # Install Docker and Docker Compose
 echo -e "${GREEN}Installing Docker and Docker Compose.${NC}"
 apt-get install -y docker.io docker-compose &>/dev/null
 
 # Install some common packages
 echo -e "${GREEN}Installing common packages.${NC}"
-apt-get install -y curl git ufw &>/dev/null
+apt-get install -y curl git ufw fail2ban &>/dev/null
+
+# Check if the protocol user is already in the docker group, and add it if it's not
+if ! id -nG $username | grep -qw docker; then
+    echo -e "${GREEN}Adding user $username to the docker group.${NC}"
+    usermod -aG docker $username
+fi
 
 # Check if the directories already exist, and create them if they don't
 if [ ! -d "/opt/nimiq/configuration" ]; then
@@ -75,10 +85,10 @@ fi
 # Download config files
 if [ "$network" == "devnet" ]; then
     echo -e "${GREEN}Downloading config file: devnet-config.toml.${NC}"
-    curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/config/devnet-config.toml -o /opt/nimiq/configuration/config.toml
+    curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/config/devnet-config.toml -o /opt/nimiq/configuration/client.toml
 elif [ "$network" == "testnet" ]; then
     echo -e "${GREEN}Downloading config file: testnet-config.toml.${NC}"
-    curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/config/testnet-config.toml -o /opt/nimiq/configuration/config.toml
+    curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/config/testnet-config.toml -o /opt/nimiq/configuration/client.toml
 else
     echo -e "${YELLOW}Invalid network parameter. Please use devnet or testnet.${NC}"
     exit 1
@@ -86,6 +96,9 @@ fi
 
 echo -e "${GREEN}Downloading Docker Compose file.${NC}"
 curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/Docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
+
+echo -e "${GREEN}Downloading Docker Compose env file.${NC}"
+curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/env_file -o /opt/nimiq/configuration/env_file
 
 # Set permissions for the directories
 echo -e "${GREEN}Setting permissions for directories.${NC}"
@@ -114,20 +127,17 @@ fi
 
 # Add firewall rules to allow incoming traffic on ports 80, 22, and 8443
 echo -e "${GREEN}Adding firewall rules.${NC}"
-ufw allow 80/tcp
-ufw allow 22/tcp
-ufw allow 8443/tcp
-
-echo -e "${GREEN}Enabling ufw.${NC}"
-echo "y" | ufw enable > /dev/null
-
-# Add firewall rules to allow incoming traffic on port 8443 (UDP)
-echo -e "${GREEN}Adding firewall rules (UDP).${NC}"
-ufw allow 8443/udp
+ufw --force enable &>/dev/null
+ufw allow 80/tcp &>/dev/null
+ufw allow 22/tcp &>/dev/null
+ufw allow 8443/tcp &>/dev/null
+ufw allow 8443/udp &>/dev/null
+echo -e "${GREEN}UFW configured successfully.${NC}"
 
 # Run the Docker container using Docker Compose
 echo -e "${GREEN}Starting Docker container.${NC}"
 cd /opt/nimiq/configuration && docker-compose up -d
 
 # Print a message indicating that the script has finished
+echo -e "${GREEN}Leave a star at: https://github.com/maestroi/nimiq-installe.${NC}"
 echo -e "${GREEN}The script has finished.${NC}"

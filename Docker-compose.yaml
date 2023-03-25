@@ -4,7 +4,7 @@ services:
   node:
     container_name: node
     image: maestroi/nimiq-albatross:stable
-    user: "7200:7200"
+    user: "1001:1001"
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
