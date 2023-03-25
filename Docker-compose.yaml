@@ -11,6 +11,7 @@ services:
       - "traefik.http.routers.node.rule=PathPrefix(`/`)"
       - "traefik.http.routers.node.entrypoints=http"
       - "traefik.http.services.node.loadbalancer.server.port=8648"
+      - "traefik.docker.network=app_net"
     environment:
       RPC_ENABLED: "true"
       NIMIQ_INSTANT_INBOUND: "true"
@@ -29,14 +30,14 @@ services:
     networks:
       - app_net
 
-  traefik:
-    container_name: traefik
-    image: traefik:v2.9.9
+  nginx:
+    container_name: nginx
+    image: nginx:latest
     restart: unless-stopped
     ports:
       - "80:80"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/opt/nimiq/configuration/node.conf:/etc/nginx/conf.d/node.conf"
     networks:
       - app_net
 

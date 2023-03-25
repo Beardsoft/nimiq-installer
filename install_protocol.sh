@@ -98,6 +98,10 @@ curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/Docker
 echo -e "${GREEN}Downloading Docker Compose env file.${NC}"
 curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/env_file -o /opt/nimiq/configuration/env_file
 
+echo -e "${GREEN}Downloading nginx file.${NC}"
+curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/config/nginx.conf -o /opt/nimiq/configuration/node.conf
+
+
 # Set permissions for the directories
 echo -e "${GREEN}Setting permissions for directories.${NC}"
 chown -R $protocol_uid:$protocol_uid /opt/nimiq/configuration /opt/nimiq/data /opt/nimiq/secrets
