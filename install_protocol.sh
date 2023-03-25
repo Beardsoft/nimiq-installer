@@ -136,11 +136,10 @@ echo -e "${GREEN}UFW configured successfully.${NC}"
 echo -e "${GREEN}Starting Docker container.${NC}"
 cd /opt/nimiq/configuration && docker-compose up -d &>/dev/null
 echo -e "${GREEN}-----------------${NC}"
-echo -e "${GREEN}To restart containers navigate /opt/nimiq/configuration ${NC}"
-echo -e "${GREEN}and run docker-compose restart ${NC}"
-echo -e "${GREEN}Follow logs with docker-compose logs ${NC}"
+echo -e "${GREEN}To restart containers navigate /opt/nimiq/configuration and run docker-compose restart ${NC}"
+echo -e "${GREEN}Follow logs with: docker-compose logs ${NC}"
 echo -e "${GREEN}-----------------${NC}"
 
 # Print a message indicating that the script has finished
-echo -e "${GREEN}Leave a star at: https://github.com/maestroi/nimiq-installer ${NC}"
+echo -e "${GREEN}For any help navigate to: https://github.com/maestroi/nimiq-installer ${NC}"
 echo -e "${GREEN}The script has finished.${NC}"
