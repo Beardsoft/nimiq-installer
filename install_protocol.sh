@@ -136,9 +136,19 @@ ufw allow 8443/tcp &>/dev/null
 ufw allow 8443/udp &>/dev/null
 echo -e "${GREEN}UFW configured successfully.${NC}"
 
+# Change to configuration directory
+cd /opt/nimiq/configuration
+
+# Check if the Docker Compose stack is already running, and stop it if it is
+if "docker-compose ps --filter 'status=running' | grep node | grep -q 'Up'"; then
+    echo -e "${GREEN}Docker Compose stack already running.${NC}"
+    echo -e "${GREEN}Stopping Docker container.${NC}"
+    docker-compose down &>/dev/null
+fi
+
 # Run the Docker container using Docker Compose
 echo -e "${GREEN}Starting Docker container.${NC}"
-cd /opt/nimiq/configuration && docker-compose up -d &>/dev/null
+docker-compose up -d &>/dev/null
 echo -e "${GREEN}-----------------${NC}"
 echo -e "${GREEN}To restart containers navigate /opt/nimiq/configuration and run docker-compose restart ${NC}"
 echo -e "${GREEN}Follow logs with: docker-compose logs ${NC}"
