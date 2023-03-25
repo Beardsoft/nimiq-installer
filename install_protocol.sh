@@ -32,6 +32,55 @@ if [[ $(lsb_release -si) != "Ubuntu" ]]; then
     exit 1
 fi
 
+# Function to install a Nimiq full node
+function install_full_node() {
+    # Download Docker Compose file
+    echo -e "${GREEN}Downloading Docker Compose file full node.${NC}"
+    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/full_node/docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
+
+    # Download Nginx configuration file
+    echo -e "${GREEN}Downloading Nginx configuration file.${NC}"
+    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/full_node/nginx.conf -o /opt/nimiq/configuration/default.conf
+    
+    ufw allow 80/tcp &>/dev/null
+
+    # Download config files
+    if [ "$network" == "devnet" ]; then
+        echo -e "${GREEN}Downloading config file: devnet-config.toml.${NC}"
+        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/full_node/devnet-config.toml -o /opt/nimiq/configuration/client.toml
+    elif [ "$network" == "testnet" ]; then
+        echo -e "${GREEN}Downloading config file: testnet-config.toml.${NC}"
+        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/full_node/testnet-config.toml -o /opt/nimiq/configuration/client.toml
+    else
+        echo -e "${YELLOW}Invalid network parameter. Please use devnet or testnet.${NC}"
+        exit 1
+    fi
+}
+
+# Function to install a Nimiq valdator node
+function install_validator() {
+    # Download Docker Compose file
+    echo -e "${GREEN}Downloading Docker Compose file full node.${NC}"
+    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
+
+    # Download Nginx configuration file
+    echo -e "${GREEN}Downloading Nginx configuration file.${NC}"
+    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/nginx.conf -o /opt/nimiq/configuration/default.conf
+    
+    # Download config files
+    if [ "$network" == "devnet" ]; then
+        echo -e "${GREEN}Downloading config file: devnet-config.toml.${NC}"
+        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/devnet-config.toml -o /opt/nimiq/configuration/client.toml
+    elif [ "$network" == "testnet" ]; then
+        echo -e "${GREEN}Downloading config file: testnet-config.toml.${NC}"
+        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/testnet-config.toml -o /opt/nimiq/configuration/client.toml
+    else
+        echo -e "${YELLOW}Invalid network parameter. Please use devnet or testnet.${NC}"
+        exit 1
+    fi
+    
+}
+
 # Create the protocol group with the specified GID (if it does not already exist)
 if ! getent group $protocol_uid &>/dev/null; then
     echo -e "${GREEN}Creating group: $protocol_uid.${NC}"
@@ -80,28 +129,6 @@ if [ ! -d "/opt/nimiq/secrets" ]; then
     mkdir -p /opt/nimiq/secrets
 fi
 
-# Download config files
-if [ "$network" == "devnet" ]; then
-    echo -e "${GREEN}Downloading config file: devnet-config.toml.${NC}"
-    curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/config/devnet-config.toml -o /opt/nimiq/configuration/client.toml
-elif [ "$network" == "testnet" ]; then
-    echo -e "${GREEN}Downloading config file: testnet-config.toml.${NC}"
-    curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/config/testnet-config.toml -o /opt/nimiq/configuration/client.toml
-else
-    echo -e "${YELLOW}Invalid network parameter. Please use devnet or testnet.${NC}"
-    exit 1
-fi
-
-echo -e "${GREEN}Downloading Docker Compose file.${NC}"
-curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/Docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
-
-echo -e "${GREEN}Downloading Docker Compose env file.${NC}"
-curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/env_file -o /opt/nimiq/configuration/env_file
-
-echo -e "${GREEN}Downloading nginx file.${NC}"
-curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/config/nginx.conf -o /opt/nimiq/configuration/default.conf
-
-
 # Set permissions for the directories
 echo -e "${GREEN}Setting permissions for directories.${NC}"
 chown -R $protocol_uid:$protocol_uid /opt/nimiq/configuration /opt/nimiq/data /opt/nimiq/secrets
@@ -111,26 +138,19 @@ chmod -R 740 /opt/nimiq/secrets
 
 #Set the RPC_ENABLED environment variable based on the node type
 if [ "$node_type" == "full_node" ]; then
-    rpc_enabled=true
+    echo -e "${GREEN}Installing Full node.${NC}"
+    install_full_node
 elif [ "$node_type" == "validator" ]; then
-    rpc_enabled=false
+    echo -e "${GREEN}Installing validator.${NC}"
+    install_validator
 else
     echo -e "${YELLOW}Invalid node_type parameter. Please use full_node or validator.${NC}"
     exit 1
 fi
 
-# Update the env_file with the RPC_ENABLED variable
-echo -e "${GREEN}Setting RPC_ENABLED environment variable.${NC}"
-if [ "$rpc_enabled" == "true" ]; then
-    sed -i 's/^RPC_ENABLED=./RPC_ENABLED=true/' /opt/nimiq/configuration/env_file
-else
-    sed -i 's/^RPC_ENABLED=./RPC_ENABLED=false/' /opt/nimiq/configuration/env_file
-fi
-
 # Add firewall rules to allow incoming traffic on ports 80, 22, and 8443
 echo -e "${GREEN}Adding firewall rules.${NC}"
 ufw --force enable &>/dev/null
-ufw allow 80/tcp &>/dev/null
 ufw allow 22/tcp &>/dev/null
 ufw allow 8443/tcp &>/dev/null
 ufw allow 8443/udp &>/dev/null
@@ -147,6 +167,14 @@ echo -e "${GREEN}-----------------${NC}"
 echo -e "${GREEN}To restart containers navigate /opt/nimiq/configuration and run docker-compose restart ${NC}"
 echo -e "${GREEN}Follow logs with: docker-compose logs ${NC}"
 echo -e "${GREEN}-----------------${NC}"
+
+
+if [ "$node_type" == "full_node" ]; then
+    # Get the public IP address
+    public_ip=$(curl -s https://api.ipify.org)
+    # Display the public IP address
+    echo -e "${GREEN}The Nimiq node is now running at: http://$public_ip${NC}"
+fi
 
 # Print a message indicating that the script has finished
 echo -e "${GREEN}For any help navigate to: https://github.com/maestroi/nimiq-installer ${NC}"
