@@ -1,7 +1,7 @@
 [network]
 peer_key_file = "peer_key.dat"
 listen_addresses = [
-	"/ip4/127.0.0.1/tcp/8443/ws",
+	"/ip4/0.0.0.0/tcp/8443/ws",
 ]
 
 seed_nodes = [

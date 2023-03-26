@@ -19,6 +19,7 @@ echo $'   /    // //  " \ / // _ `/ _/ / / _ \ (_-</ __// _ `// // // -_)/ __/ '
 echo $'  /_/|_//_//_/_/_//_/ \_, / /___//_//_//___/\__/ \_,_//_//_/ \__//_/    '
 echo $'                       /_/                                              '
 echo $' \033[0m';
+echo -e "${BLUE}Installing Nimiq with node type $node_type on $network network.${NC}"
 
 # Check if the script is running as root
 if [[ $(id -u) -ne 0 ]]; then
