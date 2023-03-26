@@ -5,6 +5,7 @@ username="protocol"
 protocol_uid=1001
 network=${1:-devnet}
 node_type=${2:-full_node}
+image="maestroi/nimiq-albatross:stable"
 
 # Colors
 GREEN='\033[0;32m'
@@ -67,7 +68,15 @@ function install_validator() {
     # Download Nginx configuration file
     echo -e "${GREEN}Downloading Nginx configuration file.${NC}"
     curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/nginx.conf -o /opt/nimiq/configuration/default.conf
-    
+
+    # Create nimiq address secrets
+    echo -e "${GREEN}Generate nimiq address secrets.${NC}"
+    generate_nimiq_address
+
+    # Create nimiq bls secrets
+    echo -e "${GREEN}Generate nimiq bls secrets.${NC}"
+    generate_nimiq_bls
+
     # Download config files
     if [ "$network" == "devnet" ]; then
         echo -e "${GREEN}Downloading config file: devnet-config.toml.${NC}"
@@ -85,7 +94,7 @@ function install_validator() {
 # Function to install the Nimiq protocol installer script
 function install_protocol_script() {
     # Set the script name
-    script_name="nimiq-updater"
+    script_name="nimiq-update"
 
     # Set the script URL
     script_url="https://raw.githubusercontent.com/maestroi/nimiq-installer/master/install_protocol.sh"
@@ -96,17 +105,59 @@ function install_protocol_script() {
     # Set the full path to the script
     script_path="$destination_dir/$script_name"
 
-    # Download the script with the current settings
-    echo -e "${GREEN}Downloading the Nimiq protocol installer script.${NC}"
-    echo curl -sSL $script_url | bash -s $network $node_type  > $script_path
+    # Define the command to run
+    cmd="curl -sSL $script_url | bash -s $network $node_type"
+
+    # Create the script file
+    echo -e "${GREEN}Creating the Nimiq installer script in $script_path.${NC}"
+    echo "#!/bin/bash" > $script_path
+    echo "# Download and run the Nimiq protocol installer script with the specified network and node type" >> $script_path
+    echo $cmd >> $script_path
 
     # Make the script executable
-    echo -e "${GREEN}Making the Nimiq protocol installer script executable.${NC}"
+    echo -e "${GREEN}Making the Nimiq installer script executable.${NC}"
     chmod +x $script_path
 
     # Display a success message
-    echo -e "${GREEN}The Nimiq protocol installer script has been installed successfully.${NC}"
+    echo -e "${GREEN}The Nimiq installer script has been installed successfully.${NC}"
 }
+
+# Function to generate a Nimiq address
+function generate_nimiq_address() {
+    # Set the path to the output file
+    output_file="/opt/nimiq/secrets/nimiq-address.txt"
+
+    # Check if the output file already exists
+    if [ -f $output_file ]; then
+        echo -e "${YELLOW}The file $output_file already exists.${NC}"
+    else
+        # Create the Docker container and run the command
+        echo -e "${GREEN}Generating a new Nimiq address.${NC}"
+        docker run --rm --name nimiq-address $image nimiq-address > $output_file
+    fi
+
+    # Display the address
+    echo -e "${GREEN}The new Nimiq address is:$(cat $output_file)${NC}"
+}
+
+# Function to generate a Nimiq address
+function generate_nimiq_address() {
+    # Set the path to the output file
+    output_file="/opt/nimiq/secrets/nimiq-bls.txt"
+
+    # Check if the output file already exists
+    if [ -f $output_file ]; then
+        echo -e "${YELLOW}The file $output_file already exists.${NC}"
+    else
+        # Create the Docker container and run the command
+        echo -e "${GREEN}Generating a new Nimiq address.${NC}"
+        docker run --rm --name nimiq-address $image nimiq-bls > $output_file
+    fi
+
+    # Display the address
+    echo -e "${GREEN}The new Nimiq address is:$(cat $output_file)${NC}"
+}
+
 
 # Create the protocol group with the specified GID (if it does not already exist)
 if ! getent group $protocol_uid &>/dev/null; then

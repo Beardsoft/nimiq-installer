@@ -1,7 +1,7 @@
 [network]
 peer_key_file = "peer_key.dat"
 listen_addresses = [
-	"/ip4/127.0.0.1/tcp/8443/ws",
+	"/ip4/0.0.0.0/tcp/8443/ws",
 ]
 
 seed_nodes = [
@@ -74,7 +74,11 @@ timestamps = true
 libp2p_swarm = "info"
 
 [validator]
-validator_address = "NQ07 0000 0000 0000 0000 0000 0000 0000 0000"
+validator_address = "CHANGE_VALIDATOR_ADDRESS"
+voting_key = "CHANGE_VOTE_KEY"
 voting_key_file = "voting_key.dat"
-fee_key_file = "fee_key.dat"
 signing_key_file = "signing_key.dat"
+signing_key = "CHNAGE_SIGN_KEY"
+fee_key_file = "fee_key.dat"
+fee_key = "CHANGE_FEE_KEY"
+automatic_reactivate = true
