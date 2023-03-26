@@ -95,10 +95,10 @@ function install_validator() {
     bls_file="/opt/nimiq/secrets/nimiq-bls.txt"
 
     # Read values from /opt/nimiq/secrets/nimiq-address.txt
-    ADDRESS=$(grep "Address:" $address_file | awk '{print $2}')
+    ADDRESS=$(cat $address_file | sed -n 's/Address:[[:space:]]*\(.*\)/\1/p')
     PUBLIC_KEY=$(grep "Public Key:" $address_file | awk '{print $3}')
     PRIVATE_KEY=$(grep "Private Key:" $address_file | awk '{print $3}')
-    SECRET_KEY=$(grep "Secret Key:" $bls_file | awk '{print $3}')
+    SECRET_KEY=$(awk '/Secret Key:/{getline; getline; print}' $bls_file)
 
     # Update client.toml
     sed -i "s/CHANGE_VALIDATOR_ADDRESS/$ADDRESS/g" $configuration_file
