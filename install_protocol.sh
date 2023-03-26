@@ -82,6 +82,32 @@ function install_validator() {
     
 }
 
+# Function to install the Nimiq protocol installer script
+function install_protocol_script() {
+    # Set the script name
+    script_name="nimiq-updater"
+
+    # Set the script URL
+    script_url="https://raw.githubusercontent.com/maestroi/nimiq-installer/master/install_protocol.sh"
+
+    # Set the destination directory
+    destination_dir="/usr/local/bin"
+
+    # Set the full path to the script
+    script_path="$destination_dir/$script_name"
+
+    # Download the script with the current settings
+    echo -e "${GREEN}Downloading the Nimiq protocol installer script.${NC}"
+    echo curl -sSL $script_url | bash -s $network $node_type  > $script_path
+
+    # Make the script executable
+    echo -e "${GREEN}Making the Nimiq protocol installer script executable.${NC}"
+    chmod +x $script_path
+
+    # Display a success message
+    echo -e "${GREEN}The Nimiq protocol installer script has been installed successfully.${NC}"
+}
+
 # Create the protocol group with the specified GID (if it does not already exist)
 if ! getent group $protocol_uid &>/dev/null; then
     echo -e "${GREEN}Creating group: $protocol_uid.${NC}"
@@ -149,6 +175,9 @@ else
     exit 1
 fi
 
+echo -e "${GREEN}Installing Nimiq update script${NC}"
+install_protocol_script
+
 # Add firewall rules to allow incoming traffic on ports 80, 22, and 8443
 echo -e "${GREEN}Adding firewall rules.${NC}"
 ufw --force enable &>/dev/null
@@ -173,6 +202,8 @@ if [ "$node_type" == "full_node" ]; then
     # Display the public IP address
     echo -e "${GREEN}The Nimiq node is now running at: http://$public_ip${NC}"
 fi
+
+
 
 # Print a message indicating that the script has finished
 echo -e "${GREEN}For any help navigate to: https://github.com/maestroi/nimiq-installer ${NC}"
