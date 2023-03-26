@@ -36,7 +36,7 @@ fi
 function install_full_node() {
     # Download Docker Compose file
     echo -e "${GREEN}Downloading Docker Compose file full node.${NC}"
-    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/full_node/docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
+    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/full_node/Docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
 
     # Download Nginx configuration file
     echo -e "${GREEN}Downloading Nginx configuration file.${NC}"
@@ -156,18 +156,15 @@ ufw allow 8443/tcp &>/dev/null
 ufw allow 8443/udp &>/dev/null
 echo -e "${GREEN}UFW configured successfully.${NC}"
 
-# Change to configuration directory
-cd /opt/nimiq/configuration
-
 # Run the Docker container using Docker Compose
 echo -e "${GREEN}Starting Docker container.${NC}"
+cd /opt/nimiq/configuration
 docker-compose down &>/dev/null
 docker-compose up -d &>/dev/null
 echo -e "${GREEN}-----------------${NC}"
 echo -e "${GREEN}To restart containers navigate /opt/nimiq/configuration and run docker-compose restart ${NC}"
 echo -e "${GREEN}Follow logs with: docker-compose logs ${NC}"
 echo -e "${GREEN}-----------------${NC}"
-
 
 if [ "$node_type" == "full_node" ]; then
     # Get the public IP address
