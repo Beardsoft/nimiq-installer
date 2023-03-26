@@ -88,7 +88,24 @@ function install_validator() {
         echo -e "${YELLOW}Invalid network parameter. Please use devnet or testnet.${NC}"
         exit 1
     fi
-    
+
+    #Set paths
+    configuration_file="/opt/nimiq/configuration/client.toml"
+    address_file="/opt/nimiq/secrets/nimiq-address.txt"
+    bls_file="/opt/nimiq/secrets/nimiq-bls.txt"
+
+    # Read values from /opt/nimiq/secrets/nimiq-address.txt
+    ADDRESS=$(grep "Address:" $address_file | awk '{print $2}')
+    PUBLIC_KEY=$(grep "Public Key:" $address_file | awk '{print $3}')
+    PRIVATE_KEY=$(grep "Private Key:" $address_file | awk '{print $3}')
+    SECRET_KEY=$(grep "Secret Key:" $bls_file | awk '{print $3}')
+
+    # Update client.toml
+    sed -i "s/CHANGE_VALIDATOR_ADDRESS/$ADDRESS/g" $configuration_file
+    sed -i "s/CHANGE_FEE_KEY/$PUBLIC_KEY/g" $configuration_file
+    sed -i "s/CHNAGE_SIGN_KEY/$PRIVATE_KEY/g" $configuration_file
+    sed -i "s/CHANGE_VOTE_KEY/$SECRET_KEY/g" $configuration_file
+
 }
 
 # Function to install the Nimiq protocol installer script
@@ -133,15 +150,12 @@ function generate_nimiq_address() {
     else
         # Create the Docker container and run the command
         echo -e "${GREEN}Generating a new Nimiq address.${NC}"
-        docker run --rm --name nimiq-address $image nimiq-address > $output_file
+        docker run --rm --name nimiq-address $image nimiq-address > $output_file 2>/dev/null
     fi
-
-    # Display the address
-    echo -e "${GREEN}The new Nimiq address is:$(cat $output_file)${NC}"
 }
 
 # Function to generate a Nimiq address
-function generate_nimiq_address() {
+function generate_nimiq_bls() {
     # Set the path to the output file
     output_file="/opt/nimiq/secrets/nimiq-bls.txt"
 
@@ -151,11 +165,8 @@ function generate_nimiq_address() {
     else
         # Create the Docker container and run the command
         echo -e "${GREEN}Generating a new Nimiq address.${NC}"
-        docker run --rm --name nimiq-address $image nimiq-bls > $output_file
+        docker run --rm --name nimiq-address $image nimiq-bls > $output_file 2>/dev/null
     fi
-
-    # Display the address
-    echo -e "${GREEN}The new Nimiq address is:$(cat $output_file)${NC}"
 }
 
 
