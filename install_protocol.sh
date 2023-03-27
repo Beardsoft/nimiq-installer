@@ -63,7 +63,7 @@ function install_full_node() {
 function install_validator() {
     # Download Docker Compose file
     echo -e "${GREEN}Downloading Docker Compose file full node.${NC}"
-    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
+    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/Docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
 
     # Download Nginx configuration file
     echo -e "${GREEN}Downloading Nginx configuration file.${NC}"
@@ -167,6 +167,14 @@ function generate_nimiq_bls() {
         echo -e "${GREEN}Generating a new Nimiq address.${NC}"
         docker run --rm --name nimiq-address $image nimiq-bls > $output_file 2>/dev/null
     fi
+}
+
+
+function activate_validator(){
+
+
+    echo -e "${GREEN}Funding Nimiq address.${NC}"
+    curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "address=NQXX XXXX XXXX XXXX XXXX XXXX XXXX XXXX XXXX" https://faucet.v2.nimiq-testnet.com/tapit
 }
 
 
