@@ -36,18 +36,6 @@ def extract_nimiq_data():
         address_line = [line for line in contents.split('\n') if line.startswith('Address:')][0]
         address = address_line.split(':')[1].strip()
 
-        # Extract the raw address
-        raw_address_line = [line for line in contents.split('\n') if line.startswith('Address (raw):')][0]
-        raw_address = raw_address_line.split(':')[1].strip()
-
-        # Extract the public key
-        public_key_line = [line for line in contents.split('\n') if line.startswith('Public Key:')][0]
-        public_key = public_key_line.split(':')[1].strip()
-
-        # Extract the private key
-        private_key_line = [line for line in contents.split('\n') if line.startswith('Private Key:')][0]
-        private_key = private_key_line.split(':')[1].strip()
-
     return address, raw_address, public_key, private_key
 
 
@@ -75,6 +63,7 @@ if __name__ == '__main__':
     #parser.add_argument('--method', type=str, required=True, help='The name of the method to call.')
     #parser.add_argument('--params', type=json.loads, required=True, help='The parameters to pass to the method, in JSON format.')
     
+    ./jsonrpc-cli 127.0.0.1:9100 sendNewValidatorTransaction 
     
     address, raw_address, public_key, private_key = extract_nimiq_data()    
     bls_public_key = extract_public_key()
@@ -86,7 +75,13 @@ if __name__ == '__main__':
     print(f"{bls_public_key}")
 
     respons = send_json_rpc(rpc_url, "getAddress", '{"null": []}')
+    
+    respons = send_json_rpc(rpc_url, "sendNewValidatorTransaction",  '{"sender_wallet": "<address>", "validator_wallet":"<address>", "signing_secret_key": "<SchnorrPublicKey>", "voting_secret_key": "<BlsPublicKey>", "reward_address": "<address>", "signal_data": "", "fee": Coin, "validity_start_height": "u32"}')
+   
+    
     print(respons)
+    
+    
     #args = parser.parse_args()
 
     #response = send_json_rpc(args.url, args.method, args.params)

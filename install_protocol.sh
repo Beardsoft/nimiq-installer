@@ -113,6 +113,8 @@ function install_validator() {
     sed -i "s/CHANGE_FEE_KEY/$FEE_KEY/g" $configuration_file
     sed -i "s/CHNAGE_SIGN_KEY/$SIGNING_KEY/g" $configuration_file
     sed -i "s/CHANGE_VOTE_KEY/$VOTING_KEY/g" $configuration_file
+
+    activate_validator
 }
 
 # Function to install the Nimiq protocol installer script
@@ -188,17 +190,21 @@ function generate_nimiq_bls() {
 
 
 function activate_validator(){
+    sleep 300
+    # Get address data
+    ADDRESS=$(curl --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getAddress","params": []}')
+    SIGKEY=$(curl --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getSigningKey","params": []}')
+    VOTEKEY=$(curl --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getVotingKey","params": []}')
 
-    SCRIPT=/opt/nimiq/configuration/activate.py
+    # Craft activate transaction
+    ACTIVATE='{"jsonrpc": "2.0","id": 1,"method": "sendNewValidatorTransaction","params": ["'"$ADDRESS"'","'"$ADDRESS"'","'"$SIGKEY"'","'"$VOTEKEY"'","'"$ADDRESS"'","""",Coin,"u32"]}'
 
-    # Download Activator configuration file
-    echo -e "${GREEN}Downloading activator validator.${NC}"
-    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/activate.py -o $SCRIPT
-
-    /usr/bin/python3 $SCRIPT
+    # Send activate transaction
+    Echo -e "${GREEN}Activating validator.${NC}"
+    response=$(curl --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data "$json_request")
 
     echo -e "${GREEN}Funding Nimiq address.${NC}"
-    curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "address=NQXX XXXX XXXX XXXX XXXX XXXX XXXX XXXX XXXX" https://faucet.v2.nimiq-testnet.com/tapit
+    curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "address=$ADDRESS" https://faucet.v2.nimiq-testnet.com/tapit
 }
 
 
@@ -297,7 +303,11 @@ if [ "$node_type" == "full_node" ]; then
     echo -e "${GREEN}The Nimiq node is now running at: http://$public_ip${NC}"
 fi
 
-
+if [ "$node_type" == "validator" ]; then
+    # Activate validator
+    activate_validator
+    echo -e "${GREEN}The Validator node is now running and active{NC}"
+fi
 
 # Print a message indicating that the script has finished
 echo -e "${GREEN}For any help navigate to: https://github.com/maestroi/nimiq-installer ${NC}"
