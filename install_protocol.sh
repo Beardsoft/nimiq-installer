@@ -190,15 +190,15 @@ function generate_nimiq_bls() {
 function activate_validator(){
     sleep 300
     # Get address data
-    ADDRESS=$(curl --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getAddress","params": []}')
-    SIGKEY=$(curl --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getSigningKey","params": []}')
-    VOTEKEY=$(curl --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getVotingKey","params": []}')
+    ADDRESS=$(curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getAddress","params": []}')
+    SIGKEY=$(curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getSigningKey","params": []}')
+    VOTEKEY=$(curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getVotingKey","params": []}')
 
     # Craft activate transaction
     ACTIVATE='{"jsonrpc": "2.0","id": 1,"method": "sendNewValidatorTransaction","params": ["'"$ADDRESS"'","'"$ADDRESS"'","'"$SIGKEY"'","'"$VOTEKEY"'","'"$ADDRESS"'","""",Coin,"u32"]}'
 
     # Send activate transaction
-    Echo -e "${GREEN}Activating validator.${NC}"
+    echo -e "${GREEN}Activating validator.${NC}"
     response=$(curl --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data "$json_request")
 
     echo -e "${GREEN}Funding Nimiq address.${NC}"
