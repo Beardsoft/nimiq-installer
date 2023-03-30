@@ -161,7 +161,6 @@ function generate_nimiq_address() {
         echo -e "${YELLOW}The file $output_file already exists.${NC}"
     else
         # Create the Docker container and run the command
-        echo -e "${GREEN}Generating a new Nimiq address.${NC}"
         docker run --rm --name nimiq-address $image nimiq-address > $output_file 2>/dev/null
     fi
 }
@@ -188,6 +187,7 @@ function generate_nimiq_bls() {
 
 
 function activate_validator(){
+    echo -e "${GREEN}Waiting for sync, can take 5minutes...${NC}"
     sleep 300
     # Get address data
     ADDRESS=$(curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getAddress","params": []}')
