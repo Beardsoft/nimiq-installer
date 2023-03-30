@@ -3,7 +3,7 @@
 # Set default values
 username="protocol"
 protocol_uid=1001
-network=${1:-devnet}
+network=${1:-testnet}
 node_type=${2:-full_node}
 image="maestroi/nimiq-albatross:stable"
 
@@ -47,14 +47,14 @@ function install_full_node() {
     ufw allow 80/tcp &>/dev/null
 
     # Download config files
-    if [ "$network" == "devnet" ]; then
-        echo -e "${GREEN}Downloading config file: devnet-config.toml.${NC}"
-        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/full_node/devnet-config.toml -o /opt/nimiq/configuration/client.toml
-    elif [ "$network" == "testnet" ]; then
+    if [ "$network" == "testnet" ]; then
         echo -e "${GREEN}Downloading config file: testnet-config.toml.${NC}"
         curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/full_node/testnet-config.toml -o /opt/nimiq/configuration/client.toml
+    elif [ "$network" == "mainnet" ]; then
+        echo -e "${GREEN}Downloading config file: mainnet-config.toml.${NC}"
+        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/full_node/mainnet-config.toml -o /opt/nimiq/configuration/client.toml
     else
-        echo -e "${YELLOW}Invalid network parameter. Please use devnet or testnet.${NC}"
+        echo -e "${YELLOW}Invalid network parameter. Please use testnet or mainnet.${NC}"
         exit 1
     fi
 }
@@ -78,14 +78,14 @@ function install_validator() {
     generate_nimiq_bls
 
     # Download config files
-    if [ "$network" == "devnet" ]; then
-        echo -e "${GREEN}Downloading config file: devnet-config.toml.${NC}"
-        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/devnet-config.toml -o /opt/nimiq/configuration/client.toml
-    elif [ "$network" == "testnet" ]; then
+    if [ "$network" == "testnet" ]; then
         echo -e "${GREEN}Downloading config file: testnet-config.toml.${NC}"
         curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/testnet-config.toml -o /opt/nimiq/configuration/client.toml
+    elif [ "$network" == "mainnet" ]; then
+        echo -e "${GREEN}Downloading config file: mainnet-config.toml.${NC}"
+        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/mainnet-config.toml -o /opt/nimiq/configuration/client.toml
     else
-        echo -e "${YELLOW}Invalid network parameter. Please use devnet or testnet.${NC}"
+        echo -e "${YELLOW}Invalid network parameter. Please use testnet or mainnet.${NC}"
         exit 1
     fi
 

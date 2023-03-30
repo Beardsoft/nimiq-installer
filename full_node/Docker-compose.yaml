@@ -6,17 +6,14 @@ services:
     image: maestroi/nimiq-albatross:stable
     user: "1001:1001"
     restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.node.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.node.entrypoints=http"
-      - "traefik.http.services.node.loadbalancer.server.port=8648"
-      - "traefik.docker.network=app_net"
+    ports:
+      - "8443:8443"
     environment:
       RPC_ENABLED: "true"
       NIMIQ_INSTANT_INBOUND: "true"
     volumes:
       - "/opt/nimiq/configuration/client.toml:/home/nimiq/.nimiq/client.toml"
+      - /opt/nimiq/data:/home/nimiq/.nimiq/testalbatross-history-consensus
     networks:
       - app_net
 

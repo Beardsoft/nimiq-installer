@@ -6,12 +6,6 @@ services:
     image: maestroi/nimiq-albatross:stable
     user: "1001:1001"
     restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.node.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.node.entrypoints=http"
-      - "traefik.http.services.node.loadbalancer.server.port=8648"
-      - "traefik.docker.network=app_net"
     environment:
       RPC_ENABLED: "true"
       NIMIQ_INSTANT_INBOUND: "true"
