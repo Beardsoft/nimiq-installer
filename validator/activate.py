@@ -5,15 +5,13 @@ import requests
 
 # Request funds from faucet
 
-faucet_url = "https://faucet.v2.nimiq-testnet.com/tapit"
+faucet_url = "https://faucet.pos.nimiq-testnet.com/tapit"
 rpc_url = "http://127.0.0.1:9100"
 
 def send_faucet_request(faucet_url, address):
     data = {'address': address}
     headers = {'content-type': 'application/x-www-form-urlencoded'}
-
     response = requests.post(faucet_url, data=data, headers=headers)
-
     return response
 
 

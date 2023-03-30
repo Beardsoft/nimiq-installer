@@ -5,6 +5,7 @@ username="protocol"
 protocol_uid=1001
 network=${1:-testnet}
 node_type=${2:-full_node}
+version=${3:-master}
 image="maestroi/nimiq-albatross:stable"
 
 # Colors
@@ -61,21 +62,31 @@ function install_full_node() {
 
 # Function to install a Nimiq valdator node
 function install_validator() {
-    # Download Docker Compose file
-    echo -e "${GREEN}Downloading Docker Compose file full node.${NC}"
-    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/Docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
+    # Set variables
+    address="/opt/nimiq/secrets/address.txt"
+    fee_key="/opt/nimiq/secrets/fee_key.txt"
+    signing_key="/opt/nimiq/secrets/signing_key.txt"
+    vote_key="/opt/nimiq/secrets/vote_key.txt"
 
-    # Download Nginx configuration file
-    echo -e "${GREEN}Downloading Nginx configuration file.${NC}"
-    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/nginx.conf -o /opt/nimiq/configuration/default.conf
+    # Download Docker Compose file
+    echo -e "${GREEN}Downloading Docker Compose file validator node.${NC}"
+    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/Docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
 
     # Create nimiq address secrets
     echo -e "${GREEN}Generate nimiq address secrets.${NC}"
-    generate_nimiq_address
+    generate_nimiq_address $address
+
+    # Generate fee key
+    echo -e "${GREEN}Generate Fee key secrets.${NC}"
+    generate_nimiq_address $fee_key
+
+    # Generate signing key
+    echo -e "${GREEN}Generate signing key secrets.${NC}"
+    generate_nimiq_address $signing_key
 
     # Create nimiq bls secrets
     echo -e "${GREEN}Generate nimiq bls secrets.${NC}"
-    generate_nimiq_bls
+    generate_nimiq_bls $vote_key
 
     # Download config files
     if [ "$network" == "testnet" ]; then
@@ -91,21 +102,20 @@ function install_validator() {
 
     #Set paths
     configuration_file="/opt/nimiq/configuration/client.toml"
-    address_file="/opt/nimiq/secrets/nimiq-address.txt"
+
     bls_file="/opt/nimiq/secrets/nimiq-bls.txt"
 
     # Read values from /opt/nimiq/secrets/nimiq-address.txt
-    ADDRESS=$(cat $address_file | sed -n 's/Address:[[:space:]]*\(.*\)/\1/p')
-    PUBLIC_KEY=$(grep "Public Key:" $address_file | awk '{print $3}')
-    PRIVATE_KEY=$(grep "Private Key:" $address_file | awk '{print $3}')
-    SECRET_KEY=$(awk '/Secret Key:/{getline; getline; print}' $bls_file)
+    ADDRESS=$(cat $address | sed -n 's/Address:[[:space:]]*\(.*\)/\1/p')
+    FEE_KEY=$(grep "Private Key:" $fee_key | awk '{print $3}')
+    SIGNING_KEY=$(grep "Private Key:" $signing_key | awk '{print $3}')
+    VOTING_KEY=$(awk '/Secret Key:/{getline; getline; print}' $bls_file)
 
     # Update client.toml
     sed -i "s/CHANGE_VALIDATOR_ADDRESS/$ADDRESS/g" $configuration_file
     sed -i "s/CHANGE_FEE_KEY/$PUBLIC_KEY/g" $configuration_file
-    sed -i "s/CHNAGE_SIGN_KEY/$PRIVATE_KEY/g" $configuration_file
-    sed -i "s/CHANGE_VOTE_KEY/$SECRET_KEY/g" $configuration_file
-
+    sed -i "s/CHNAGE_SIGN_KEY/$SIGNING_KEY/g" $configuration_file
+    sed -i "s/CHANGE_VOTE_KEY/$VOTING_KEY/g" $configuration_file
 }
 
 # Function to install the Nimiq protocol installer script
@@ -144,6 +154,11 @@ function generate_nimiq_address() {
     # Set the path to the output file
     output_file="/opt/nimiq/secrets/nimiq-address.txt"
 
+    # Check if an output file parameter was passed and set the output file path accordingly
+    if [ "$1" != "" ]; then
+        output_file=$1
+    fi
+
     # Check if the output file already exists
     if [ -f $output_file ]; then
         echo -e "${YELLOW}The file $output_file already exists.${NC}"
@@ -157,7 +172,12 @@ function generate_nimiq_address() {
 # Function to generate a Nimiq address
 function generate_nimiq_bls() {
     # Set the path to the output file
-    output_file="/opt/nimiq/secrets/nimiq-bls.txt"
+    output_file="/opt/nimiq/secrets/votekey.txt"
+
+    # Check if an output file parameter was passed and set the output file path accordingly
+    if [ "$1" != "" ]; then
+        output_file=$1
+    fi
 
     # Check if the output file already exists
     if [ -f $output_file ]; then
@@ -172,6 +192,13 @@ function generate_nimiq_bls() {
 
 function activate_validator(){
 
+    SCRIPT=/opt/nimiq/configuration/activate.py
+
+    # Download Activator configuration file
+    echo -e "${GREEN}Downloading activator validator.${NC}"
+    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/activate.py -o $SCRIPT
+
+    /usr/bin/python3 $SCRIPT
 
     echo -e "${GREEN}Funding Nimiq address.${NC}"
     curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "address=NQXX XXXX XXXX XXXX XXXX XXXX XXXX XXXX XXXX" https://faucet.v2.nimiq-testnet.com/tapit
