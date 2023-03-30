@@ -102,18 +102,15 @@ function install_validator() {
 
     #Set paths
     configuration_file="/opt/nimiq/configuration/client.toml"
-
-    bls_file="/opt/nimiq/secrets/nimiq-bls.txt"
-
     # Read values from /opt/nimiq/secrets/nimiq-address.txt
     ADDRESS=$(cat $address | sed -n 's/Address:[[:space:]]*\(.*\)/\1/p')
     FEE_KEY=$(grep "Private Key:" $fee_key | awk '{print $3}')
     SIGNING_KEY=$(grep "Private Key:" $signing_key | awk '{print $3}')
-    VOTING_KEY=$(awk '/Secret Key:/{getline; getline; print}' $bls_file)
+    VOTING_KEY=$(awk '/Secret Key:/{getline; getline; print}' $vote_key)
 
     # Update client.toml
     sed -i "s/CHANGE_VALIDATOR_ADDRESS/$ADDRESS/g" $configuration_file
-    sed -i "s/CHANGE_FEE_KEY/$PUBLIC_KEY/g" $configuration_file
+    sed -i "s/CHANGE_FEE_KEY/$FEE_KEY/g" $configuration_file
     sed -i "s/CHNAGE_SIGN_KEY/$SIGNING_KEY/g" $configuration_file
     sed -i "s/CHANGE_VOTE_KEY/$VOTING_KEY/g" $configuration_file
 }
