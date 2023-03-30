@@ -199,10 +199,10 @@ function activate_validator(){
 
     # Send activate transaction
     echo -e "${GREEN}Activating validator.${NC}"
-    response=$(curl --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data "$json_request")
+    response=$(curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data "$json_request")
 
     echo -e "${GREEN}Funding Nimiq address.${NC}"
-    curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "address=$ADDRESS" https://faucet.v2.nimiq-testnet.com/tapit
+    curl -s -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "address=NQ92 EQJ7 PSG7 SRGE 8LT1 DG4M 06DY FYU9 6RYP" https://faucet.v2.nimiq-testnet.com/tapit
 }
 
 
