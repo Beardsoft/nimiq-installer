@@ -113,8 +113,6 @@ function install_validator() {
     sed -i "s/CHANGE_FEE_KEY/$FEE_KEY/g" $configuration_file
     sed -i "s/CHNAGE_SIGN_KEY/$SIGNING_KEY/g" $configuration_file
     sed -i "s/CHANGE_VOTE_KEY/$VOTING_KEY/g" $configuration_file
-
-    activate_validator
 }
 
 # Function to install the Nimiq protocol installer script
