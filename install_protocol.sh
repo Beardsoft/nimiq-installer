@@ -60,6 +60,35 @@ function install_full_node() {
     fi
 }
 
+function check_block_height() {
+    while true; do
+        # Get the height from the external API
+        height=$(curl -s https://blockmatrix.acestaking.com/blockheight/nimiq/testnet | jq '.height')
+
+        # Get the height from the local node
+        local_height=$(curl --location 'http://localhost:8648' \
+                        --header 'Content-Type: application/json' \
+                        --data ' {
+                            "jsonrpc": "2.0",
+                            "method": "getBlockNumber",
+                            "params": [],
+                            "id": 1
+                        }' | jq '.result.data')
+
+        # Compare the heights
+        diff=$(($height - $local_height))
+        if (( $diff < -100 || $diff > 100 )); then
+            # If the heights differ by more than 100, break the loop and continue with the rest of the code
+            echo "Heights are close enough, continuing..."
+            break
+        else
+            # If the heights are within 100 blocks of each other, wait for sync
+            echo -e "${GREEN}Waiting for sync, wait 15 seconds${NC}"
+            sleep 15
+        fi
+    done
+}
+
 # Function to install a Nimiq valdator node
 function install_validator() {
     # Set variables
@@ -187,8 +216,10 @@ function generate_nimiq_bls() {
 
 
 function activate_validator(){
-    echo -e "${GREEN}Waiting for sync, can take 5minutes...${NC}"
-    sleep 300
+    echo -e "${GREEN}Waiting for sync, can take 15minutes...${NC}"
+    
+    check_block_height
+
     # Get address data
     ADDRESS=$(curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getAddress","params": []}')
     SIGKEY=$(curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getSigningKey","params": []}')
