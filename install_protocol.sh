@@ -261,7 +261,7 @@ apt-get install -y docker.io docker-compose &>/dev/null
 
 # Install some common packages
 echo -e "${GREEN}Installing common packages.${NC}"
-apt-get install -y curl git ufw fail2ban &>/dev/null
+apt-get install -y curl jq git ufw fail2ban &>/dev/null
 
 # Check if the protocol user is already in the docker group, and add it if it's not
 if ! id -nG $username | grep -qw docker; then
