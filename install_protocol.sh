@@ -63,27 +63,32 @@ function install_full_node() {
 function check_block_height() {
     while true; do
         # Get the height from the external API
-        height=$(curl -s https://blockmatrix.acestaking.com/blockheight/nimiq/testnet | jq '.height')
+        while ! height=$(curl -s https://blockmatrix.acestaking.com/blockheight/nimiq/testnet | jq '.height'); do
+            echo "Failed to get height from external API, retrying in 5 seconds..."
+            sleep 5
+        done
 
         # Get the height from the local node
-        local_height=$(curl --location 'http://localhost:8648' \
-                        --header 'Content-Type: application/json' \
-                        --data ' {
-                            "jsonrpc": "2.0",
-                            "method": "getBlockNumber",
-                            "params": [],
-                            "id": 1
-                        }' | jq '.result.data')
-
+        while ! local_height=$(curl -s --location 'http://localhost:8648' \
+                                --header 'Content-Type: application/json' \
+                                --data ' {
+                                    "jsonrpc": "2.0",
+                                    "method": "getBlockNumber",
+                                    "params": [],
+                                    "id": 1
+                                }' | jq '.result.data'); do
+            echo "Failed to get height from local node, retrying in 5 seconds..."
+            sleep 5
+        done
         # Compare the heights
         diff=$(($height - $local_height))
         if (( $diff < -100 || $diff > 100 )); then
             # If the heights differ by more than 100, break the loop and continue with the rest of the code
-            echo "Heights are close enough, continuing..."
+            echo "${GREEN}Heights are close enough, continuing..."
             break
         else
             # If the heights are within 100 blocks of each other, wait for sync
-            echo -e "${GREEN}Waiting for sync, wait 15 seconds${NC}"
+            echo -e "${YELLOW}Waiting for sync, wait 15 seconds${NC}"
             sleep 15
         fi
     done
