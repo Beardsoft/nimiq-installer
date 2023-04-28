@@ -80,10 +80,10 @@ function check_block_height() {
             echo "Failed to get height from local node, retrying in 5 seconds..."
             sleep 5
         done
+
         # Compare the heights
-        diff=$(($height - $local_height))
-        if (( $diff < -100 || $diff > 100 )); then
-            # If the heights differ by more than 100, break the loop and continue with the rest of the code
+        if (( $local_height < ($height - 100) || $local_height > ($height + 100) )); then
+            # If the local height is more than 100 blocks different from the external height, break the loop and continue with the rest of the code
             echo -e "${GREEN}Heights are close enough, continuing..."
             break
         else
