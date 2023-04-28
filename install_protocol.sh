@@ -84,7 +84,7 @@ function check_block_height() {
         diff=$(($height - $local_height))
         if (( $diff < -100 || $diff > 100 )); then
             # If the heights differ by more than 100, break the loop and continue with the rest of the code
-            echo "${GREEN}Heights are close enough, continuing..."
+            echo -e "${GREEN}Heights are close enough, continuing..."
             break
         else
             # If the heights are within 100 blocks of each other, wait for sync
@@ -138,6 +138,7 @@ function install_validator() {
     configuration_file="/opt/nimiq/configuration/client.toml"
     # Read values from /opt/nimiq/secrets/nimiq-address.txt
     ADDRESS=$(cat $address | sed -n 's/Address:[[:space:]]*\(.*\)/\1/p')
+    ADDRESS_PRIVATE=$(grep "Private Key:" $address | awk '{print $3}')
     FEE_KEY=$(grep "Private Key:" $fee_key | awk '{print $3}')
     SIGNING_KEY=$(grep "Private Key:" $signing_key | awk '{print $3}')
     VOTING_KEY=$(awk '/Secret Key:/{getline; getline; print}' $vote_key)
@@ -230,15 +231,19 @@ function activate_validator(){
     SIGKEY=$(curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getSigningKey","params": []}')
     VOTEKEY=$(curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getVotingKey","params": []}')
 
-    # Craft activate transaction
-    ACTIVATE='{"jsonrpc": "2.0","id": 1,"method": "sendNewValidatorTransaction","params": ["'"$ADDRESS"'","'"$ADDRESS"'","'"$SIGKEY"'","'"$VOTEKEY"'","'"$ADDRESS"'","""",Coin,"u32"]}'
-
-    # Send activate transaction
-    echo -e "${GREEN}Activating validator.${NC}"
-    response=$(curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data "$json_request")
 
     echo -e "${GREEN}Funding Nimiq address.${NC}"
     curl -s -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "address=$ADDRESS" https://faucet.pos.nimiq-testnet.com/tapit
+
+    echo -e "${GREEN}Importing private key.${NC}"
+    curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc" "2.0","id": 1,"method": "importRawKey","params": ["'$ADDRESS_PRIVATE'"]}'
+    
+    echo -e "${GREEN}Unlock Account.${NC}"
+    curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "unlockAccount","params": ["'$ADDRESS'"]}'
+
+    echo -e "${GREEN}Activate Validator${NC}"
+    curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "sendNewValidatorTransaction","params": ["'"$ADDRESS"'","'"$ADDRESS"'","'"$SIGKEY"'","'"$VOTEKEY"'","'"$ADDRESS"'","""",Coin,"u32"]}'
+
 }
 
 
