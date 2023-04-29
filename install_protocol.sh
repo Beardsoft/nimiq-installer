@@ -81,13 +81,13 @@ function check_block_height() {
             sleep 5
         done
 
-        # Compare the heights
-        if (( $local_height < ($height - 100) || $local_height > ($height + 100) )); then
-            # If the local height is more than 100 blocks different from the external height, break the loop and continue with the rest of the code
+        if (( $local_height < ($height - 100) )); then
+            echo -e "${GREEN}Heights are close enough, continuing..."
+            break
+        elif (( $local_height > ($height + 100) )); then
             echo -e "${GREEN}Heights are close enough, continuing..."
             break
         else
-            # If the heights are within 100 blocks of each other, wait for sync
             echo -e "${YELLOW}Waiting for sync, wait 15 seconds${NC}"
             sleep 15
         fi
