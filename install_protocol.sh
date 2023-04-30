@@ -69,7 +69,7 @@ function check_block_height() {
         done
 
         # Get the height from the local node
-        while ! local_height=$(curl -s --location 'http://localhost:8648' --header 'Content-Type: application/json' --data ' { "jsonrpc": "2.0", "method": "getBlockNumber", "params": [], "id": 1 }' | jq '.result.data'); do
+        while ! local_height=$(curl -s --location 'http://localhost:8648' --header 'Content-Type: application/json' --data ' { "jsonrpc": "2.0", "method": "getBlockNumber", "params": [], "id": 1 }' | jq -r '.result.data'); do
             echo "Failed to get height from local node, retrying in 5 seconds..."
             sleep 5
         done
