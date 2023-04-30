@@ -246,6 +246,11 @@ if [ ! -d "/opt/nimiq/secrets" ]; then
     mkdir -p /opt/nimiq/secrets
 fi
 
+if [ ! -d "/opt/nimiq/bin" ]; then
+    echo -e "${GREEN}Creating directory: /opt/nimiq/bin.${NC}"
+    mkdir -p /opt/nimiq/bin
+fi
+
 # Set permissions for the directories
 echo -e "${GREEN}Setting permissions for directories.${NC}"
 chown -R $protocol_uid:$protocol_uid /opt/nimiq/configuration /opt/nimiq/data /opt/nimiq/secrets
