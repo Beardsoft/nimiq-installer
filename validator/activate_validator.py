@@ -12,7 +12,7 @@ import shutil
 NIMIQ_NODE_URL = 'http://127.0.0.1:8648'
 FACUET_URL = 'https://faucet.pos.nimiq-testnet.com/tapit'
 DOCKER_IMAGE = 'maestroi/nimiq-albatross:stable'
-BASE_FOLDER = '/opt/nimiq/secrets'
+BASE_FOLDER = '/opt/nimiq'
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s — %(message)s',
@@ -46,11 +46,8 @@ def generate_nimiq_bls(output_file):
             subprocess.run(cmd.split(), stdout=f, stderr=subprocess.DEVNULL)
 
 def install_validator(version, network):
-    # Set variables
-    
     secrets_folder = f'{BASE_FOLDER}/secrets'
     config_folder = f'{BASE_FOLDER}/configuration'
-    
     files = {
         'address': f'{secrets_folder}/address.txt',
         'fee_key': f'{secrets_folder}/fee_key.txt',
@@ -193,7 +190,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Activate Validator')
     parser.add_argument('--version', type=str, default='master', help='The version of the repo branch to use (master or dev)')
     parser.add_argument('--network', type=str, default='testnet', help='The network to use (testnet or mainnet)')
-    parser.add_argument('--private-key', type=str, required=True, default="/opt/nimiq/secrets/address.txt", help='Path to the private key file')
+    parser.add_argument('--private-key', type=str, default="/opt/nimiq/secrets/address.txt", help='Path to the private key file')
     args = parser.parse_args()
     install_validator(args.version, args.network)
     check_block_height()
