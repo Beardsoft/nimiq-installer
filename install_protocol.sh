@@ -81,10 +81,13 @@ function check_block_height() {
             sleep 5
         done
 
-        if (( $local_height < ($height - 100) )); then
+        above_threshold=$($height + 100)
+        below_threshold=$($height - 100)
+        
+        if (( $local_height < $below_threshold )); then
             echo -e "${GREEN}Heights are close enough, continuing..."
             break
-        elif (( $local_height > ($height + 100) )); then
+        elif (( $local_height > $above_threshold )); then
             echo -e "${GREEN}Heights are close enough, continuing..."
             break
         else
@@ -236,13 +239,13 @@ function activate_validator(){
     curl -s -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "address=$ADDRESS" https://faucet.pos.nimiq-testnet.com/tapit
 
     echo -e "${GREEN}Importing private key.${NC}"
-    curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc" "2.0","id": 1,"method": "importRawKey","params": ["'$ADDRESS_PRIVATE'"]}'
+    curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc" "2.0","id": 1,"method": "importRawKey","params": ["$ADDRESS_PRIVATE"]}'
     
     echo -e "${GREEN}Unlock Account.${NC}"
-    curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "unlockAccount","params": ["'$ADDRESS'"]}'
+    curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "unlockAccount","params": ["$ADDRESS"]}'
 
     echo -e "${GREEN}Activate Validator${NC}"
-    curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "sendNewValidatorTransaction","params": ["'"$ADDRESS"'","'"$ADDRESS"'","'"$SIGKEY"'","'"$VOTEKEY"'","'"$ADDRESS"'","""",Coin,"u32"]}'
+    curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "sendNewValidatorTransaction","params": ["$ADDRESS","$ADDRESS","$SIGKEY","$VOTEKEY","$ADDRESS","""",Coin,"u32"]}'
 
 }
 
