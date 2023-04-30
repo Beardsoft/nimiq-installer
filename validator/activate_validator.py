@@ -142,8 +142,10 @@ def needs_funds(address):
     else:
         return False
 
-def activate_validator(private_key_location):
+def activate_validator():
     # Get address data
+    private_key_location = f'{BASE_FOLDER}/secrets/address.txt'
+    
     res = nimiq_request("getAddress")
     ADDRESS = res['data']
     logging.info("Address: %s", ADDRESS)
@@ -190,9 +192,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Activate Validator')
     parser.add_argument('--version', type=str, default='master', help='The version of the repo branch to use (master or dev)')
     parser.add_argument('--network', type=str, default='testnet', help='The network to use (testnet or mainnet)')
-    parser.add_argument('--private-key', type=str, default="/opt/nimiq/secrets/address.txt", help='Path to the private key file')
     args = parser.parse_args()
     install_validator(args.version, args.network)
     check_block_height()
-    activate_validator(args.private_key)
+    activate_validator()
     

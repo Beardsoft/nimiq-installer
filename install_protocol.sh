@@ -100,7 +100,7 @@ function install_validator(){
     pip install requests
 
     chmod +x /opt/nimiq/bin/activate_validator.py
-    python3 /opt/nimiq/bin/activate_validator.py --version $version --network $network
+    python3 /opt/nimiq/bin/activate_validator.py --version $version --network $network --private-key /opt/nimiq/secrets/address.txt
 }
 
 # Create the protocol group with the specified GID (if it does not already exist)
