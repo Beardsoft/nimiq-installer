@@ -39,55 +39,25 @@ fi
 function install_full_node() {
     # Download Docker Compose file
     echo -e "${GREEN}Downloading Docker Compose file full node.${NC}"
-    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/full_node/Docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
+    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/$version/full_node/Docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
 
     # Download Nginx configuration file
     echo -e "${GREEN}Downloading Nginx configuration file.${NC}"
-    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/full_node/nginx.conf -o /opt/nimiq/configuration/default.conf
+    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/$version/full_node/nginx.conf -o /opt/nimiq/configuration/default.conf
     
     ufw allow 80/tcp &>/dev/null
 
     # Download config files
     if [ "$network" == "testnet" ]; then
         echo -e "${GREEN}Downloading config file: testnet-config.toml.${NC}"
-        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/full_node/testnet-config.toml -o /opt/nimiq/configuration/client.toml
+        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/$version/full_node/testnet-config.toml -o /opt/nimiq/configuration/client.toml
     elif [ "$network" == "mainnet" ]; then
         echo -e "${GREEN}Downloading config file: mainnet-config.toml.${NC}"
-        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/full_node/mainnet-config.toml -o /opt/nimiq/configuration/client.toml
+        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/$version/full_node/mainnet-config.toml -o /opt/nimiq/configuration/client.toml
     else
         echo -e "${YELLOW}Invalid network parameter. Please use testnet or mainnet.${NC}"
         exit 1
     fi
-}
-
-function check_block_height() {
-    while true; do
-        # Get the height from the external API
-        while ! height=$(curl -s https://blockmatrix.acestaking.com/blockheight/nimiq/testnet | jq '.height'); do
-            echo "Failed to get height from external API, retrying in 5 seconds..."
-            sleep 5
-        done
-
-        # Get the height from the local node
-        while ! local_height=$(curl -s --location 'http://localhost:8648' --header 'Content-Type: application/json' --data ' { "jsonrpc": "2.0", "method": "getBlockNumber", "params": [], "id": 1 }' | jq -r '.result.data'); do
-            echo "Failed to get height from local node, retrying in 5 seconds..."
-            sleep 5
-        done
-
-        above_threshold=$(($height + 100))
-        below_threshold=$(($height - 100))
-        
-        if (( local_height < below_threshold )); then
-            echo -e "${GREEN}Heights are close enough, continuing..."
-            break
-        elif (( local_height > above_threshold )); then
-            echo -e "${GREEN}Heights are close enough, continuing..."
-            break
-        else
-            echo -e "${YELLOW}Waiting for sync, wait 15 seconds${NC}"
-            sleep 15
-        fi
-    done
 }
 
 # Function to install a Nimiq valdator node
@@ -100,7 +70,7 @@ function install_validator() {
 
     # Download Docker Compose file
     echo -e "${GREEN}Downloading Docker Compose file validator node.${NC}"
-    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/Docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
+    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/$version/validator/Docker-compose.yaml -o /opt/nimiq/configuration/docker-compose.yaml
 
     # Create nimiq address secrets
     echo -e "${GREEN}Generate nimiq address secrets.${NC}"
@@ -121,10 +91,10 @@ function install_validator() {
     # Download config files
     if [ "$network" == "testnet" ]; then
         echo -e "${GREEN}Downloading config file: testnet-config.toml.${NC}"
-        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/testnet-config.toml -o /opt/nimiq/configuration/client.toml
+        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/$version/validator/testnet-config.toml -o /opt/nimiq/configuration/client.toml
     elif [ "$network" == "mainnet" ]; then
         echo -e "${GREEN}Downloading config file: mainnet-config.toml.${NC}"
-        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/validator/mainnet-config.toml -o /opt/nimiq/configuration/client.toml
+        curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/$version/validator/mainnet-config.toml -o /opt/nimiq/configuration/client.toml
     else
         echo -e "${YELLOW}Invalid network parameter. Please use testnet or mainnet.${NC}"
         exit 1
@@ -152,7 +122,7 @@ function install_protocol_script() {
     script_name="nimiq-update"
 
     # Set the script URL
-    script_url="https://raw.githubusercontent.com/maestroi/nimiq-installer/master/install_protocol.sh"
+    script_url="https://raw.githubusercontent.com/maestroi/nimiq-installer/$version/install_protocol.sh"
 
     # Set the destination directory
     destination_dir="/usr/local/bin"
@@ -216,29 +186,15 @@ function generate_nimiq_bls() {
     fi
 }
 
-
 function activate_validator(){
-    echo -e "${GREEN}Waiting for sync, can take 15minutes...${NC}"
-    
-    check_block_height
+    echo -e "${GREEN}Downloading validator activator${NC}"
+    curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/$version/validator/activate_validator.py -o /opt/nimiq/bin/activate_validator.py
 
-    # Get address data
-    ADDRESS=$(curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getAddress","params": []}' | jq -r '.result.data')
-    SIGKEY=$(curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getSigningKey","params": []}' | jq -r '.result.data')
-    VOTEKEY=$(curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "getVotingKey","params": []}' | jq -r '.result.data')
+    echo -e "${GREEN}Install requirements for script${NC}"
+    pip install requests
 
-
-    echo -e "${GREEN}Funding Nimiq address.${NC}"
-    curl -s -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "address=$ADDRESS" https://faucet.pos.nimiq-testnet.com/tapit
-
-    echo -e "${GREEN}Importing private key.${NC}"
-    curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data "{\"jsonrpc\": \"2.0\",\"id\": 1,\"method\": \"importRawKey\",\"params\": [\"$ADDRESS_PRIVATE\"]}"
-
-    echo -e "${GREEN}Unlock Account.${NC}"
-    curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "unlockAccount","params": ["'"$ADDRESS"'"]}'
-
-    echo -e "${GREEN}Activate Validator${NC}"
-    curl -s --location 'http://127.0.0.1:8648' --header 'Content-Type: application/json' --data '{"jsonrpc": "2.0","id": 1,"method": "sendNewValidatorTransaction","params": ["'"$ADDRESS"'","'"$ADDRESS"'","'"$SIGKEY"'","'"$VOTEKEY"'","'"$ADDRESS"'","","0"]}'
+    chmod +x /opt/nimiq/bin/activate_validator.py
+    python3 /opt/nimiq/bin/activate_validator.py --private-key=/opt/nimiq/secrets/address.txt
 }
 
 
@@ -262,7 +218,7 @@ apt-get upgrade -y &>/dev/null
 
 # Install Docker and Docker Compose
 echo -e "${GREEN}Installing Docker and Docker Compose.${NC}"
-apt-get install -y docker.io docker-compose &>/dev/null
+apt-get install -y docker.io docker-compose python3 python3-pip &>/dev/null
 
 # Install some common packages
 echo -e "${GREEN}Installing common packages.${NC}"
