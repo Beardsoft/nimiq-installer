@@ -8,7 +8,7 @@ import argparse
 import logging
 
 NIMIQ_NODE_URL = 'http://127.0.0.1:8648'
-EXTERNAL_API_URL = 'https://blockmatrix.acestaking.com/blockheight/nimiq/testnet'\
+EXTERNAL_API_URL = 'https://blockmatrix.acestaking.com/blockheight/nimiq/testnet'
 FACUET_URL = 'https://faucet.pos.nimiq-testnet.com/tapit'
 
 logging.basicConfig(level=logging.INFO,
