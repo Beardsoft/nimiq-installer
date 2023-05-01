@@ -81,7 +81,8 @@ def activate_validator(private_key_location):
     nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", "0"])
 
 def check_block_height():
-    logging.info("Waiting for consensus to be established.")
+    logging.info("Waiting for consensus to be established, this may take a while...")
+    logging.info("Don't close this window!")
     while True:
         res = nimiq_request("isConsensusEstablished")
         if res['data'] == True:
