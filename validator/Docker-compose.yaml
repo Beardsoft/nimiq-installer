@@ -14,7 +14,7 @@ services:
       NIMIQ_INSTANT_INBOUND: "true"
     volumes:
       - "/opt/nimiq/configuration/client.toml:/home/nimiq/.nimiq/client.toml"
-      - "/opt/nimiq/data:/home/nimiq/.nimiq/testalbatross-history-consensus"
+      - "/opt/nimiq/data:/home/nimiq/.nimiq/testalbatross-full-consensus"
     networks:
       - app_net
 
