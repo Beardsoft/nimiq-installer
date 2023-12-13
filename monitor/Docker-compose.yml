@@ -10,7 +10,7 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana-storage:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./provisioning:/etc/grafana/provisioning
 
   prometheus:
     image: prom/prometheus:latest
