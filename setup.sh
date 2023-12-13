@@ -7,7 +7,7 @@ REPO_URL="https://github.com/maestroi/nimiq-installer.git"
 REPO_DIR="/opt/nimiq-installer"
 network=${1:-testnet}
 node_type=${2:-full_node}
-version=${3:-master}  # Specify branch or tag if needed
+version=${3:-improvements}  # Specify branch or tag if needed
 
 # Colors for output
 GREEN='\033[0;32m'
