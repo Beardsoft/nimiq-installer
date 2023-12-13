@@ -13,27 +13,48 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo -n $'\033[0;32m'
-echo $''
-echo $'     _  __ _         _         ____           __         __ __          '
-echo $'    / |/ /(_)__ _   (_)___ _  /  _/___   ___ / /_ ___ _ / // /___  ____ '
-echo $'   /    // //  " \ / // _ `/ _/ / / _ \ (_-</ __// _ `// // // -_)/ __/ '
-echo $'  /_/|_//_//_/_/_//_/ \_, / /___//_//_//___/\__/ \_,_//_//_/ \__//_/    '
-echo $'                       /_/                                              '
-echo $' \033[0m';
-echo -e "${BLUE}Installing Nimiq with node type $node_type on $network network.${NC}"
+
+function print_banner() {
+    echo -n $'\033[0;32m'
+    echo $''
+    echo $'     _  __ _         _         ____           __         __ __          '
+    echo $'    / |/ /(_)__ _   (_)___ _  /  _/___   ___ / /_ ___ _ / // /___  ____ '
+    echo $'   /    // //  " \ / // _ `/ _/ / / _ \ (_-</ __// _ `// // // -_)/ __/ '
+    echo $'  /_/|_//_//_/_/_//_/ \_, / /___//_//_//___/\__/ \_,_//_//_/ \__//_/    '
+    echo $'                       /_/                                              '
+    echo $' \033[0m';
+    echo -e "${BLUE}Installing Nimiq with node type $node_type on $network network.${NC}"
+}
+
 
 # Check if the script is running as root
-if [[ $(id -u) -ne 0 ]]; then
-    echo -e "${YELLOW}This script must be run as root.${NC}"
-    exit 1
-fi
+function check_root() {
+    if [[ $(id -u) -ne 0 ]]; then
+        echo -e "${RED}This script must be run as root.${NC}"
+        exit 1
+    fi
+}
 
 # Check if the OS is Ubuntu
-if [[ $(lsb_release -si) != "Ubuntu" ]]; then
-    echo -e "${YELLOW}This script is only compatible with Ubuntu.${NC}"
-    exit 1
-fi
+function check_os() {
+    if [[ $(lsb_release -si) != "Ubuntu" ]]; then
+        echo -e "${RED}This script is only compatible with Ubuntu.${NC}"
+        exit 1
+    fi
+}
+
+# Validate network and node type
+function validate_inputs() {
+    if [[ $network != "testnet" ]]; then
+        echo -e "${RED}Invalid network parameter. Please use 'testnet'.${NC}"
+        exit 1
+    fi
+
+    if [[ $node_type != "full_node" && $node_type != "validator" ]]; then
+        echo -e "${RED}Invalid node_type parameter. Please use 'full_node' or 'validator'.${NC}"
+        exit 1
+    fi
+}
 
 # Function to install a Nimiq full node
 function install_full_node() {
@@ -46,6 +67,7 @@ function install_full_node() {
     curl -sSL https://raw.githubusercontent.com/maestroi/nimiq-installer/$version/full_node/nginx.conf -o /opt/nimiq/configuration/default.conf
     
     ufw allow 80/tcp &>/dev/null
+    ufw allow 443/tcp &>/dev/null
 
     # Download config files
     if [ "$network" == "testnet" ]; then
@@ -271,40 +293,56 @@ else
     exit 1
 fi
 
-echo -e "${GREEN}Installing Nimiq update script${NC}"
-install_protocol_script
 
-# Add firewall rules to allow incoming traffic on ports 80, 22, and 8443
-echo -e "${GREEN}Adding firewall rules.${NC}"
-ufw --force enable &>/dev/null
-ufw allow 22/tcp &>/dev/null
-ufw allow 8443/tcp &>/dev/null
-ufw allow 8443/udp &>/dev/null
-echo -e "${GREEN}UFW configured successfully.${NC}"
+main() {
+    print_banner
+    check_root
+    check_os
+    validate_inputs
 
-# Run the Docker container using Docker Compose
-echo -e "${GREEN}Starting Docker container.${NC}"
-cd /opt/nimiq/configuration
-docker-compose down &>/dev/null
-docker-compose up -d &>/dev/null
-echo -e "${GREEN}-----------------${NC}"
-echo -e "${GREEN}To restart containers navigate /opt/nimiq/configuration and run docker-compose restart ${NC}"
-echo -e "${GREEN}Follow logs with: docker-compose logs ${NC}"
-echo -e "${GREEN}-----------------${NC}"
+    echo -e "${GREEN}Installing Nimiq update script${NC}"
+    install_protocol_script
 
-if [ "$node_type" == "full_node" ]; then
-    # Get the public IP address
-    public_ip=$(curl -s https://api.ipify.org)
-    # Display the public IP address
-    echo -e "${GREEN}The Nimiq node is now running at: http://$public_ip${NC}"
-fi
+    # Add firewall rules to allow incoming traffic on ports 80, 22, and 8443
+    echo -e "${GREEN}Adding firewall rules.${NC}"
+    ufw --force enable &>/dev/null
+    ufw allow 22/tcp &>/dev/null
+    ufw allow 8443/tcp &>/dev/null
+    ufw allow 8443/udp &>/dev/null
+    echo -e "${GREEN}UFW configured successfully.${NC}"
 
-if [ "$node_type" == "validator" ]; then
-    # Activate validator
-    activate_validator
-    echo -e "${GREEN}The Validator node is now running and active{NC}"
-fi
+    # Run the Docker container using Docker Compose
+    echo -e "${GREEN}Starting Docker container.${NC}"
+    cd /opt/nimiq/configuration
+    docker-compose down &>/dev/null
+    docker-compose up -d &>/dev/null
+    echo -e "${GREEN}-----------------${NC}"
+    echo -e "${GREEN}To restart containers navigate /opt/nimiq/configuration and run docker-compose restart ${NC}"
+    echo -e "${GREEN}Follow logs with: docker-compose logs ${NC}"
+    echo -e "${GREEN}-----------------${NC}"
 
-# Print a message indicating that the script has finished
-echo -e "${GREEN}For any help navigate to: https://github.com/maestroi/nimiq-installer ${NC}"
-echo -e "${GREEN}The script has finished.${NC}"
+    if [ "$node_type" == "full_node" ]; then
+        # Get the public IP address
+        public_ip=$(curl -s https://api.ipify.org)
+        # Display the public IP address
+        echo -e "${GREEN}The Nimiq node is now running at: http://$public_ip${NC}"
+    fi
+
+    if [ "$node_type" == "validator" ]; then
+        # Activate validator
+        activate_validator
+        echo -e "${GREEN}The Validator node is now running and active{NC}"
+    fi
+
+    if [[ -f /tmp/startup-script.sh ]]; then
+    /bin/bash /tmp/startup-script.sh
+    rm /tmp/startup-script.sh
+    fi
+
+    # Print a message indicating that the script has finished
+    echo -e "${GREEN}For any help navigate to: https://github.com/maestroi/nimiq-installer ${NC}"
+    echo -e "${GREEN}The script has finished.${NC}"
+
+}
+
+main
