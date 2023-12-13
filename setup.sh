@@ -5,6 +5,8 @@
 # Set default values
 REPO_URL="https://github.com/maestroi/nimiq-installer.git"
 REPO_DIR="/opt/nimiq-installer"
+username="protocol"
+protocol_uid=1001
 network=${1:-testnet}
 node_type=${2:-full_node}
 version=${3:-improvements}  # Specify branch or tag if needed
@@ -56,12 +58,42 @@ function validate_inputs() {
     fi
 }
 
+function install_docker() {
+    echo -e "${GREEN}Installing Docker...${NC}"
+    apt-get update &>/dev/null
+    apt-get install -y docker.io docker-compose python3 python3-pip &>/dev/null
+    if ! id -nG $username | grep -qw docker; then
+        echo -e "${GREEN}Adding user $username to the docker group.${NC}"
+        usermod -aG docker $username
+    fi
+    echo -e "${GREEN}Docker installation complete.${NC}"
+}
+
+function install_packages() {
+    echo -e "${GREEN}Installing packages...${NC}"
+    apt-get update &>/dev/null
+    apt-get install -y curl jq libjq1 libonig5 git ufw fail2ban &>/dev/null
+    echo -e "${GREEN}Package installation complete.${NC}"
+}
 
 # Function to clone the repository
 function clone_repo() {
     echo -e "${GREEN}Cloning Nimiq installer repository...${NC}"
     git clone $REPO_URL $REPO_DIR --branch $version
     cd $REPO_DIR
+}
+
+functio setup_user() {
+    # Create the protocol group with the specified GID (if it does not already exist)
+    if ! getent group $protocol_uid &>/dev/null; then
+        echo -e "${GREEN}Creating group: $protocol_uid.${NC}"
+        groupadd -r -g $protocol_uid $username
+    fi
+    if ! id -u $username > /dev/null 2>&1; then
+        echo -e "${GREEN}Creating user: $username with ID: $protocol_uid .${NC}"
+        id -u $username &>/dev/null || useradd -r -m -u $protocol_uid -g $protocol_uid -s /usr/sbin/nologin $username
+    fi
+
 }
 
 # Function to set up a full node
@@ -203,6 +235,9 @@ function main() {
     check_os
     validate_inputs
     clone_repo
+    setup_user
+    install_docker
+    install_packages
 
     if [ "$node_type" == "full_node" ]; then
         setup_full_node
