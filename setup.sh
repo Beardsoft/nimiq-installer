@@ -62,6 +62,7 @@ function install_docker() {
     echo -e "${GREEN}Installing Docker...${NC}"
     apt-get update &>/dev/null
     apt-get install -y docker.io docker-compose python3 python3-pip &>/dev/null
+    docker network create app_net &>/dev/null
     if ! id -nG $username | grep -qw docker; then
         echo -e "${GREEN}Adding user $username to the docker group.${NC}"
         usermod -aG docker $username
