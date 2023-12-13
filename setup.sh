@@ -83,7 +83,7 @@ function clone_repo() {
     cd $REPO_DIR
 }
 
-functio setup_user() {
+function setup_user() {
     # Create the protocol group with the specified GID (if it does not already exist)
     if ! getent group $protocol_uid &>/dev/null; then
         echo -e "${GREEN}Creating group: $protocol_uid.${NC}"
