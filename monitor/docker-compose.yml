@@ -13,7 +13,9 @@ services:
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     volumes:
       - grafana-storage:/var/lib/grafana
-      - ./provisioning:/etc/grafana/provisioning
+      - ./provisioning/prometheus.yml:/usr/share/grafana/conf/provisioning/datasources/prometheus.yml
+      - ./provisioning/default_dashboards.yml:/usr/share/grafana/conf/provisioning/dashboards/default_dashboards.yml
+      - ./provisioning:/usr/share/grafana/conf/provisioning
     networks:
       - app_net
 

@@ -8,7 +8,7 @@ import argparse
 import logging
 
 NIMIQ_NODE_URL = 'http://127.0.0.1:8648'
-EXTERNAL_API_URL = 'https://blockmatrix.acestaking.com/blockheight/nimiq/testnet'
+EXTERNAL_API_URL = 'https://rpc.nimiqcloud.com/'
 FACUET_URL = 'https://faucet.pos.nimiq-testnet.com/tapit'
 
 logging.basicConfig(level=logging.INFO,
@@ -17,20 +17,33 @@ logging.basicConfig(level=logging.INFO,
                     handlers=[logging.StreamHandler()])
 
 def nimiq_request(method, params=None):
-    response = requests.post(NIMIQ_NODE_URL, json={
-        "jsonrpc": "2.0",
-        "id": 1,
-        "method": method,
-        "params": params or [],
-    })
-    if response.status_code != 200:
-        logging.error(f"Error: {response.status_code}")
-        return None
-    result = response.json().get('result', {})
-    if result is None:
-        logging.error(f"Error: {response.text}")
-        return None
-    return result
+    try:
+        response = requests.post(NIMIQ_NODE_URL, json={
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": method,
+            "params": params or [],
+        })
+        response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
+
+        result = response.json().get('result', {})
+        if result is None:
+            raise ValueError("No result in response")
+        return result
+
+    except requests.exceptions.HTTPError as errh:
+        logging.error("Http Error:", errh)
+    except requests.exceptions.ConnectionError as errc:
+        logging.error("Error Connecting:", errc)
+    except requests.exceptions.Timeout as errt:
+        logging.error("Timeout Error:", errt)
+    except requests.exceptions.RequestException as err:
+        logging.error("Error: Something went wrong with the request", err)
+    except ValueError as err:
+        logging.error("Error: Invalid response format", err)
+
+    return None
+
 
 def get_private_key(file_path):
     with open(file_path, 'r') as f:
