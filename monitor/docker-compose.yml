@@ -12,10 +12,10 @@ services:
       - GF_SERVER_ROOT_URL=http://192.168.50.101/grafana/
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     volumes:
-      # - grafana-storage:/var/lib/grafana
-      - ./provisioning/prometheus.yml:/usr/share/grafana/conf/provisioning/datasources.yml
-      - ./provisioning/default_dashboards.yml:/usr/share/grafana/conf/provisioning/default_dashboards.yml
-      - ./provisioning:/usr/share/grafana/conf/provisioning
+      - grafana-storage:/var/lib/grafana
+      - ./provisioning/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./provisioning/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml
+      - ./provisioning/dashboards/:/etc/grafana/provisioning/dashboards/
     networks:
       - app_net
 
