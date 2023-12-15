@@ -231,6 +231,10 @@ function setup_monitoring() {
     docker-compose up -d
 
     echo -e "${GREEN}Monitoring setup completed successfully.${NC}"
+    echo -e "${GREEN}Wait few seconds before grafana is ready${NC}"
+    sleep(5)
+    echo -e "${GREEN}Monitoring setup completed successfully.${NC}"
+    echo -e "${GREEN}You can login with Username: Admin and Password: Admin.${NC}"
     echo -e "${GREEN}Grafana is running at: http://$public_ip/grafana${NC}"
 
 }
