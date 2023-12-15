@@ -145,7 +145,6 @@ function setup_full_node() {
 }
 
 # Function to set up a validator node
-# Function to set up a validator node
 function setup_validator_node() {
     echo -e "${GREEN}Setting up Nimiq Validator Node...${NC}"
 
@@ -221,11 +220,19 @@ function setup_monitoring() {
     # Copy the monitoring configuration files to the target directory
     cp -r ${monitor_source_dir}/* $monitor_target_dir
 
+    # Get the public IP address
+    public_ip=$(curl -s https://api.ipify.org)
+
+    # Replace the placeholder in docker-compose.yml with the actual IP
+    sed -i "s/REPLACE_IP_HERE/$public_ip/g" $monitor_target_dir/docker-compose.yml
+
     # Navigate to the target monitoring directory and start the services
     cd $monitor_target_dir
     docker-compose up -d
 
     echo -e "${GREEN}Monitoring setup completed successfully.${NC}"
+    echo -e "${GREEN}Grafana is running at: http://$public_ip/grafana${NC}"
+
 }
 
 
