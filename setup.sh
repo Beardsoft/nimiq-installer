@@ -59,14 +59,15 @@ function validate_inputs() {
 }
 
 function setup_firewall() {
+    echo -e "${GREEN}Installing Firewall rules${NC}"
     # Allow SSH
-    ufw allow 22/tcp
+    ufw allow 22/tcp &>/dev/null
 
     # Allow nimiq traffic
-    ufw allow 8443/tcp
+    ufw allow 8443/tcp &>/dev/null
 
     # Enable UFW
-    ufw --force enable
+    ufw --force enable &>/dev/null
 }
 
 function install_docker() {
@@ -152,8 +153,8 @@ function setup_full_node() {
     echo -e "${GREEN}Starting the Nimiq Full Nde Docker container...${NC}"
 
     # Allow HTTP and HTTPS traffic
-    ufw allow 80/tcp
-    ufw allow 443/tcp
+    ufw allow 80/tcp &>/dev/null
+    ufw allow 443/tcp &>/dev/null
 
     docker-compose up -d &>/dev/null
 
@@ -251,7 +252,7 @@ function setup_monitoring() {
     sleep 5
     echo -e "${GREEN}Monitoring setup completed successfully.${NC}"
     echo -e "${YELLOW}Login with Username: Admin and Password: Admin.${NC}"
-    echo -e "${RED}Use a secure password!${NC}"
+    echo -e "${YELLOW}Use a secure password!${NC}"
     echo -e "${GREEN}Grafana is running at: http://$public_ip/grafana${NC}"
 
 }

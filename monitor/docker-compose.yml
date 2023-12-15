@@ -11,7 +11,7 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=http://REPLACE_IP_HERE/grafana/
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
-      - GF_DEFAULT_DASHBOARD=c881fde4-44f1-4af8-8e70-f1896070b006
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH =/etc/grafana/provisioning/dashboards/nimiq.json
     volumes:
       - grafana-storage:/var/lib/grafana
       - ./provisioning/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
