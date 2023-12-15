@@ -9,8 +9,9 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_SERVER_ROOT_URL=http://192.168.50.101/grafana/
+      - GF_SERVER_ROOT_URL=http://REPLACE_IP_HERE/grafana/
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_DEFAULT_DASHBOARD=rYdddlPWk
     volumes:
       - grafana-storage:/var/lib/grafana
       - ./provisioning/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
