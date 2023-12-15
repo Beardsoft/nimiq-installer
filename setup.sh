@@ -58,6 +58,17 @@ function validate_inputs() {
     fi
 }
 
+function setup_firewall() {
+    # Allow SSH
+    ufw allow 22/tcp
+
+    # Allow nimiq traffic
+    ufw allow 8443/tcp
+
+    # Enable UFW
+    ufw --force enable
+}
+
 function install_docker() {
     echo -e "${GREEN}Installing Docker...${NC}"
     apt-get update &>/dev/null
@@ -80,7 +91,7 @@ function install_packages() {
 # Function to clone the repository
 function clone_repo() {
     echo -e "${GREEN}Cloning Nimiq installer repository...${NC}"
-    git clone $REPO_URL $REPO_DIR --branch $version
+    git clone $REPO_URL $REPO_DIR --branch $version &>/dev/null
     cd $REPO_DIR
 }
 
@@ -138,8 +149,13 @@ function setup_full_node() {
 
     # Navigate to the working directory and start the Docker container
     cd $work_dir
-    echo -e "${GREEN}Starting the Nimiq Full Node Docker container...${NC}"
-    docker-compose up -d
+    echo -e "${GREEN}Starting the Nimiq Full Nde Docker container...${NC}"
+
+    # Allow HTTP and HTTPS traffic
+    ufw allow 80/tcp
+    ufw allow 443/tcp
+
+    docker-compose up -d &>/dev/null
 
     echo -e "${GREEN}Nimiq Full Node setup complete.${NC}"
 }
@@ -193,7 +209,7 @@ function setup_validator_node() {
 
     # Start the Docker container
     echo -e "${GREEN}Starting the Nimiq Validator Node Docker container...${NC}"
-    docker-compose up -d
+    docker-compose up -d &>/dev/null
 
     # Activate the validator node if necessary
     if [ -f "activate_validator.py" ]; then
@@ -228,13 +244,14 @@ function setup_monitoring() {
 
     # Navigate to the target monitoring directory and start the services
     cd $monitor_target_dir
-    docker-compose up -d
+    docker-compose up -d &>/dev/null
 
     echo -e "${GREEN}Monitoring setup completed successfully.${NC}"
     echo -e "${GREEN}Wait few seconds before grafana is ready${NC}"
     sleep 5
     echo -e "${GREEN}Monitoring setup completed successfully.${NC}"
-    echo -e "${GREEN}You can login with Username: Admin and Password: Admin.${NC}"
+    echo -e "${YELLOW}Login with Username: Admin and Password: Admin.${NC}"
+    echo -e "${RED}Use a secure password!${NC}"
     echo -e "${GREEN}Grafana is running at: http://$public_ip/grafana${NC}"
 
 }
@@ -246,6 +263,7 @@ function main() {
     check_root
     check_os
     validate_inputs
+    setup_firewall
     clone_repo
     setup_user
     install_docker
