@@ -14,6 +14,7 @@ FACUET_URL = 'https://faucet.pos.nimiq-testnet.com/tapit'
 
 # Prometheus Metrics
 ACTIVATED_AMOUNT = Gauge('nimiq_activated_amount', 'Amount activated', ['address'])
+EPOCH_NUMBER = Gauge('nimiq_epoch_number', 'Epoch number')
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s — %(message)s',
@@ -68,6 +69,12 @@ def get_address():
         return None
     return res['data']
 
+def get_epoch_number():
+    res = nimiq_request("getEpochNumber")
+    if res is None:
+        return None
+    EPOCH_NUMBER.set(res['data'])
+
 def activate_validator(private_key_location):
     ADDRESS = get_address()
     logging.info(f"Address: {ADDRESS}")
@@ -100,7 +107,7 @@ def activate_validator(private_key_location):
     logging.info("Activate Validator")
     nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", "0"])
     
-    ACTIVATED_AMOUNT.labels(address=ADDRESS).set(1)  # Assuming amount activated is 1, adjust as needed
+    ACTIVATED_AMOUNT.labels(address=ADDRESS).inc()
     return ADDRESS
 
 def is_validator_active(address):
@@ -119,7 +126,6 @@ def check_and_activate_validator(private_key_location, address):
 
 def check_block_height():
     logging.info("Waiting for consensus to be established, this may take a while...")
-    logging.info("Don't close this window!")
     while True:
         res = nimiq_request("isConsensusEstablished")
         if res is not None and res.get('data') == True:
@@ -139,6 +145,7 @@ if __name__ == '__main__':
     # Run indefinitely
     while True:
         check_block_height()
+        get_epoch_number()
         address = get_address()
         check_and_activate_validator(args.private_key, address)
         time.sleep(180)  # Wait for a minute before checking again
