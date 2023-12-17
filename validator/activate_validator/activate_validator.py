@@ -62,12 +62,14 @@ def needs_funds(address):
     else:
         return False
 
-def activate_validator(private_key_location):
-    # Get address data
+def get_address():
     res = nimiq_request("getAddress")
     if res is None:
-        return
-    ADDRESS = res['data']
+        return None
+    return res['data']
+
+def activate_validator(private_key_location):
+    ADDRESS = get_address()
     logging.info(f"Address: {ADDRESS}")
 
     res = nimiq_request("getSigningKey")
@@ -137,5 +139,6 @@ if __name__ == '__main__':
     # Run indefinitely
     while True:
         check_block_height()
-        check_and_activate_validator(args.private_key)
+        address = get_address()
+        check_and_activate_validator(args.private_key, address)
         time.sleep(1)  # Wait for a minute before checking again
