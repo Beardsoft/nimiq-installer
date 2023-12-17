@@ -200,7 +200,7 @@ function setup_validator_node() {
     # Generate the validator key if it doesn't exist
     cd "${work_dir}/gen_keys"
     docker build -t nimiq-key-generator .
-    docker run --rm -v "${work_dir}/secrets:/keys" nimiq-key-generator
+    docker run --rm -v "${work_dir}/secrets:/keys" -u 0 nimiq-key-generator
 
     # Define file paths for the keys
     local address="${work_dir}/secrets/nimiq-address.txt"
