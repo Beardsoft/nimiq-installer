@@ -26,18 +26,33 @@ Be aware executing things directly in terminal as root, check the files first!
 
 ## Full node
 ```bash
-curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/install_protocol.sh | bash -s testnet full_node
+curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/setup.sh| bash -s testnet full_node
 ``` 
 
 ## Validator
-Still sometimes activation can have some problems!
+Should be activating automatically on the next epoch, check grafana dashboard for logs.
+Your validator address can be found in the grafana dashboard!
+
+you can always check nimstats.com!
 
 ```bash
-curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/install_protocol.sh | bash -s testnet validator
+curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/setup.sh | bash -s testnet validator
 ``` 
 # Use cloud-config
-make sure you tag validator or full noed
+make sure you tag validator or full node
 You can use the cloud config for any populair cloud provider to use for startup any node
 
+# Monitoring
+Login with admin/nimiq by default you can login with your own password after first login.
+Url for your grafan instance will be http://YOURIP/grafana
+
+We use the following components
+- Prometheus
+- Grafana
+- Node exporter
+- Loki
+- Promtail
+
+You can customize any alerts or settings to your liking.
 
 # Made possible by Maestro and Acestaking
