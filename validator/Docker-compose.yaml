@@ -45,9 +45,11 @@ services:
       context: ./activate_validator
     volumes:
       - "/opt/nimiq/validator/secrets:/keys"
+    ports:
+      - "127.0.0.1:8000:8000"
     depends_on:
       - node
-    restart: "no"
+    restart: unless-stopped
     networks:
       - app_net
 

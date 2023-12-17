@@ -6,9 +6,14 @@ import json
 import time
 import argparse
 import logging
+from prometheus_client import start_http_server, Gauge
+
 
 NIMIQ_NODE_URL = 'http://node:8648'
 FACUET_URL = 'https://faucet.pos.nimiq-testnet.com/tapit'
+
+# Prometheus Metrics
+ACTIVATED_AMOUNT = Gauge('nimiq_activated_amount', 'Amount activated', ['address'])
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s — %(message)s',
@@ -92,6 +97,22 @@ def activate_validator(private_key_location):
 
     logging.info("Activate Validator")
     nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", "0"])
+    
+    ACTIVATED_AMOUNT.labels(address=ADDRESS).set(1)  # Assuming amount activated is 1, adjust as needed
+
+def is_validator_active():
+    res = nimiq_request("getActiveValidators")
+    if res is None:
+        return False
+    active_validators = res.get('data', [])
+    return ADDRESS in active_validators
+
+def check_and_activate_validator(private_key_location):
+    if not is_validator_active():
+        activate_validator(private_key_location)
+    else:
+        logging.info("Validator already active.")
+
 
 def check_block_height():
     logging.info("Waiting for consensus to be established, this may take a while...")
@@ -105,11 +126,15 @@ def check_block_height():
             time.sleep(5)
 
 if __name__ == '__main__':
+    start_http_server(8000)  # Start Prometheus client
     logging.info(40 * '-')
     logging.info('Nimiq validator activation script')
     logging.info(40 * '-')
     parser = argparse.ArgumentParser(description='Activate Validator')
     parser.add_argument('--private-key', type=str, default="/keys/address.txt", help='Path to the private key file')
     args = parser.parse_args()
-    check_block_height()
-    activate_validator(args.private_key)
+    # Run indefinitely
+    while True:
+        check_block_height()
+        check_and_activate_validator(args.private_key)
+        time.sleep(1)  # Wait for a minute before checking again
