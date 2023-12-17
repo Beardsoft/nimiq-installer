@@ -33,6 +33,18 @@ services:
     networks:
       - app_net
 
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "127.0.0.1:3100:3100"
+    volumes:
+      - loki-storage:/loki
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - app_net
+
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter

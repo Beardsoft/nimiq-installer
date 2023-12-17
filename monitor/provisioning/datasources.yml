@@ -6,3 +6,9 @@ datasources:
     orgId: 1
     url: http://prometheus:9090
     basicAuth: false
+  - name: Loki
+    type: Loki
+    access: proxy
+    orgId: 1
+    url: http://loki:3100
+    basicAuth: false
