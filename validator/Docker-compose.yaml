@@ -44,7 +44,7 @@ services:
     build:
       context: ./activate_validator
     volumes:
-      - "/opt/nimiq/validator/keys:/keys"
+      - "/opt/nimiq/validator/keys:/secrets"
     depends_on:
       - node
     restart: "no"
