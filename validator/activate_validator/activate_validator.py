@@ -21,6 +21,17 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%Y-%m-%d_%H:%M:%S',
                     handlers=[logging.StreamHandler()])
 
+def store_activation_epoch(epoch):
+    with open("activation_epoch.txt", "w") as file:
+        file.write(str(epoch))
+
+def read_activation_epoch():
+    if os.path.exists("activation_epoch.txt"):
+        with open("activation_epoch.txt", "r") as file:
+            return int(file.read().strip())
+    return None
+
+
 def nimiq_request(method, params=None, retries=3, delay=5):
     while retries > 0:
         try:
@@ -106,6 +117,9 @@ def activate_validator(private_key_location):
     else:
         logging.info("Address already funded.")
 
+    current_epoch = nimiq_request("getEpochNumber")['data']
+    store_activation_epoch(current_epoch)
+
     logging.info("Importing private key.")
     nimiq_request("importRawKey", [ADDRESS_PRIVATE, ''])
 
@@ -127,10 +141,19 @@ def is_validator_active(address):
     return address in active_validators
 
 def check_and_activate_validator(private_key_location, address):
-    if not is_validator_active(address):
-        activate_validator(private_key_location)
+    current_epoch = nimiq_request("getEpochNumber")['data']
+    activation_epoch = read_activation_epoch()
+
+
+    if activation_epoch is None or current_epoch > activation_epoch:
+        if not is_validator_active(address):
+            activate_validator(private_key_location)
+        else:
+            logging.info("Validator already active.")
     else:
-        logging.info("Validator already active.")
+        next_epoch = activation_epoch + 1
+        logging.info(f"Next epoch to activate validator: {next_epoch}")
+        logging.info("Waiting for next epoch to activate validator.")
 
 def check_block_height():
     logging.info("Waiting for consensus to be established, this may take a while...")
