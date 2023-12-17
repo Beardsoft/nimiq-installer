@@ -51,6 +51,9 @@ services:
     networks:
       - app_net
 
+volumes:
+  data:
+
 networks:
   app_net:
     driver: bridge
