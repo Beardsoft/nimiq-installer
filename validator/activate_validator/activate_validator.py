@@ -84,18 +84,18 @@ def activate_validator(private_key_location):
     VOTEKEY = res['data']
     logging.info(f"Voting Key: {VOTEKEY}")
 
+    ADDRESS_PRIVATE = get_private_key(private_key_location)
+
     logging.info("Funding Nimiq address.")
     if needs_funds(ADDRESS):
         requests.post(FACUET_URL, data={'address': ADDRESS})
+        logging.info("Importing private key.")
+        nimiq_request("importRawKey", [ADDRESS_PRIVATE])
+
+        logging.info("Unlock Account.")
+        nimiq_request("unlockAccount", [ADDRESS])
     else:
         logging.info("Address already funded.")
-
-    ADDRESS_PRIVATE = get_private_key(private_key_location)
-    logging.info("Importing private key.")
-    nimiq_request("importRawKey", [ADDRESS_PRIVATE])
-
-    logging.info("Unlock Account.")
-    nimiq_request("unlockAccount", [ADDRESS])
 
     logging.info("Activate Validator")
     nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", "0"])
@@ -141,4 +141,4 @@ if __name__ == '__main__':
         check_block_height()
         address = get_address()
         check_and_activate_validator(args.private_key, address)
-        time.sleep(1)  # Wait for a minute before checking again
+        time.sleep(180)  # Wait for a minute before checking again
