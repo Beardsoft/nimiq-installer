@@ -24,6 +24,8 @@ logging.basicConfig(level=logging.INFO,
 def nimiq_request(method, params=None, retries=3, delay=5):
     while retries > 0:
         try:
+            logging.debug(method)
+            logging.debug(params)
             response = requests.post(NIMIQ_NODE_URL, json={
                 "jsonrpc": "2.0",
                 "id": 1,
@@ -31,6 +33,7 @@ def nimiq_request(method, params=None, retries=3, delay=5):
                 "params": params or [],
             })
             response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
+            logging.debug(response.json())
             result = response.json().get('result', {})
             if result is None:
                 raise ValueError("No result in response")
@@ -89,22 +92,29 @@ def activate_validator(private_key_location):
     VOTEKEY = res['data']
     logging.info(f"Voting Key: {VOTEKEY}")
 
+    res = nimiq_request("getBlockNumber")
+    if res is None:
+        return
+    BLOCKNUMBER = str(res['data'])
+    logging.info(f"Blocknumber: {BLOCKNUMBER}")
+
     ADDRESS_PRIVATE = get_private_key(private_key_location)
 
     logging.info("Funding Nimiq address.")
     if needs_funds(ADDRESS):
         requests.post(FACUET_URL, data={'address': ADDRESS})
-        logging.info("Importing private key.")
-        nimiq_request("importRawKey", [ADDRESS_PRIVATE])
-
-        logging.info("Unlock Account.")
-        nimiq_request("unlockAccount", [ADDRESS])
     else:
         logging.info("Address already funded.")
 
+    logging.info("Importing private key.")
+    nimiq_request("importRawKey", [ADDRESS_PRIVATE, ''])
+
+    logging.info("Unlock Account.")
+    nimiq_request("unlockAccount", [ADDRESS, '', 0])
+
     logging.info("Activate Validator")
-    nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", "0"])
-    
+    nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 2,BLOCKNUMBER])
+
     ACTIVATED_AMOUNT.labels(address=ADDRESS).inc()
     return ADDRESS
 
@@ -146,4 +156,4 @@ if __name__ == '__main__':
         get_epoch_number()
         address = get_address()
         check_and_activate_validator(args.private_key, address)
-        time.sleep(180)  # Wait for a minute before checking again
+        time.sleep(3600)  # Wait for a minute before checking again
