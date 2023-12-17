@@ -18,7 +18,6 @@
     "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 2,
     "links": [],
     "liveNow": false,
     "panels": [
@@ -822,7 +821,7 @@
         },
         "gridPos": {
           "h": 8,
-          "w": 8,
+          "w": 6,
           "x": 0,
           "y": 6
         },
@@ -921,16 +920,16 @@
         },
         "gridPos": {
           "h": 8,
-          "w": 8,
-          "x": 8,
+          "w": 6,
+          "x": 6,
           "y": 6
         },
         "id": 8,
         "options": {
           "legend": {
             "calcs": [],
-            "displayMode": "table",
-            "placement": "right",
+            "displayMode": "list",
+            "placement": "bottom",
             "showLegend": true
           },
           "tooltip": {
@@ -1020,11 +1019,11 @@
         },
         "gridPos": {
           "h": 8,
-          "w": 8,
-          "x": 16,
+          "w": 6,
+          "x": 12,
           "y": 6
         },
-        "id": 7,
+        "id": 12,
         "options": {
           "legend": {
             "calcs": [],
@@ -1045,7 +1044,8 @@
             },
             "disableTextWrap": false,
             "editorMode": "builder",
-            "expr": "nimiq_blockchain_block_number",
+            "exemplar": false,
+            "expr": "nimiq_accounts_trie_accounts",
             "fullMetaSearch": false,
             "includeNullMetadata": true,
             "instant": false,
@@ -1055,7 +1055,7 @@
             "useBackend": false
           }
         ],
-        "title": "Blockheight",
+        "title": "Accounts",
         "type": "timeseries"
       },
       {
@@ -1119,9 +1119,9 @@
         },
         "gridPos": {
           "h": 8,
-          "w": 8,
-          "x": 0,
-          "y": 14
+          "w": 6,
+          "x": 18,
+          "y": 6
         },
         "id": 11,
         "options": {
@@ -1158,104 +1158,54 @@
         "type": "timeseries"
       },
       {
-        "datasource": {
-          "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
-        },
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "axisBorderShow": false,
-              "axisCenteredZero": false,
-              "axisColorMode": "text",
-              "axisLabel": "",
-              "axisPlacement": "auto",
-              "barAlignment": 0,
-              "drawStyle": "line",
-              "fillOpacity": 0,
-              "gradientMode": "none",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "insertNulls": false,
-              "lineInterpolation": "linear",
-              "lineWidth": 1,
-              "pointSize": 5,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "showPoints": "auto",
-              "spanNulls": false,
-              "stacking": {
-                "group": "A",
-                "mode": "none"
-              },
-              "thresholdsStyle": {
-                "mode": "off"
-              }
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
-          },
-          "overrides": []
-        },
+        "collapsed": false,
         "gridPos": {
-          "h": 8,
-          "w": 8,
-          "x": 8,
+          "h": 1,
+          "w": 24,
+          "x": 0,
           "y": 14
         },
-        "id": 12,
+        "id": 19,
+        "panels": [],
+        "title": "Logs",
+        "type": "row"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "P8E80F9AEF21F6940"
+        },
+        "gridPos": {
+          "h": 24,
+          "w": 24,
+          "x": 0,
+          "y": 15
+        },
+        "id": 18,
         "options": {
-          "legend": {
-            "calcs": [],
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": true
-          },
-          "tooltip": {
-            "mode": "single",
-            "sort": "none"
-          }
+          "dedupStrategy": "exact",
+          "enableLogDetails": false,
+          "prettifyLogMessage": true,
+          "showCommonLabels": false,
+          "showLabels": false,
+          "showTime": false,
+          "sortOrder": "Descending",
+          "wrapLogMessage": false
         },
         "targets": [
           {
             "datasource": {
-              "type": "prometheus",
-              "uid": "PBFA97CFB590B2093"
+              "type": "loki",
+              "uid": "P8E80F9AEF21F6940"
             },
-            "disableTextWrap": false,
-            "editorMode": "builder",
-            "exemplar": false,
-            "expr": "nimiq_accounts_trie_accounts",
-            "fullMetaSearch": false,
-            "includeNullMetadata": true,
-            "instant": false,
-            "legendFormat": "Blockheight",
-            "range": true,
-            "refId": "A",
-            "useBackend": false
+            "editorMode": "code",
+            "expr": "{container_name=\"/node\"}",
+            "queryType": "range",
+            "refId": "A"
           }
         ],
-        "title": "Accounts",
-        "type": "timeseries"
+        "title": "Nimiq logs",
+        "type": "logs"
       }
     ],
     "refresh": "10s",
@@ -1272,6 +1222,6 @@
     "timezone": "",
     "title": "Nimiq",
     "uid": "c881fde4-44f1-4af8-8e70-f1896070b006",
-    "version": 2,
+    "version": 1,
     "weekStart": ""
   }
