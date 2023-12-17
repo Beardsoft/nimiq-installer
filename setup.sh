@@ -162,6 +162,7 @@ function setup_full_node() {
 }
 
 # Function to set up a validator node
+# Function to set up a validator node
 function setup_validator_node() {
     echo -e "${GREEN}Setting up Nimiq Validator Node...${NC}"
 
@@ -192,34 +193,51 @@ function setup_validator_node() {
     mkdir -p $work_dir
     cp $config_file "${work_dir}/client.toml"
 
+    # Copy generated keys to the working directory
+    cp -r "${config_dir}/gen_keys" "${work_dir}/gen_keys"
+    mkdir -p "${work_dir}/secrets"
+
+    # Generate the validator key if it doesn't exist
+    cd "${work_dir}/gen_keys"
+    docker build -t nimiq-key-generator .
+    docker run --rm -v "${work_dir}/secrets:/keys" nimiq-key-generator
+
+    # Define file paths for the keys
+    local address="${work_dir}/secrets/nimiq-address.txt"
+    local fee_key="${work_dir}/secrets/fee-key.txt"
+    local signing_key="${work_dir}/secrets/signing-key.txt"
+    local vote_key="${work_dir}/secrets/vote-key.txt"
+    local configuration_file="${work_dir}/client.toml"
+
+    # Read values from secret files
+    ADDRESS=$(cat $address | sed -n 's/Address:[[:space:]]*\(.*\)/\1/p')
+    ADDRESS_PRIVATE=$(grep "Private Key:" $address | awk '{print $3}')
+    FEE_KEY=$(grep "Private Key:" $fee_key | awk '{print $3}')
+    SIGNING_KEY=$(grep "Private Key:" $signing_key | awk '{print $3}')
+    VOTING_KEY=$(awk '/Secret Key:/{getline; getline; print}' $vote_key)
+
+    # Update client.toml
+    sed -i "s/CHANGE_VALIDATOR_ADDRESS/$ADDRESS/g" $configuration_file
+    sed -i "s/CHANGE_FEE_KEY/$FEE_KEY/g" $configuration_file
+    sed -i "s/CHANGE_SIGN_KEY/$SIGNING_KEY/g" $configuration_file
+    sed -i "s/CHANGE_VOTE_KEY/$VOTING_KEY/g" $configuration_file
+
+    # Copy validator activator script to the working directory
+    cp -r "${config_dir}/activate_validator" "${work_dir}/activate_validator"
+
     # Copy Docker-compose file and other necessary files
     cp "${config_dir}/Docker-compose.yaml" "${work_dir}/docker-compose.yaml"
-    cp "${config_dir}/activate_validator.py" "${work_dir}/activate_validator.py"
-    cp "${config_dir}/requirements.txt" "${work_dir}/requirements.txt"
-    cp "${config_dir}/nimiq-address.txt" "${work_dir}/"
-    cp "${config_dir}/nimiq-bls.txt" "${work_dir}/"
-    cp "${config_dir}/bls.txt" "${work_dir}/"
 
     # Navigate to the working directory
     cd $work_dir
-
-    # Install any Python dependencies required for the validator activation script
-    if [ -f "requirements.txt" ]; then
-        pip install -r requirements.txt
-    fi
 
     # Start the Docker container
     echo -e "${GREEN}Starting the Nimiq Validator Node Docker container...${NC}"
     docker-compose up -d &>/dev/null
 
-    # Activate the validator node if necessary
-    if [ -f "activate_validator.py" ]; then
-        echo -e "${GREEN}Activating the validator node...${NC}"
-        python activate_validator.py --private-key=nimiq-address.txt
-    fi
-
     echo -e "${GREEN}Nimiq Validator Node setup complete.${NC}"
 }
+
 
 # Function to install and configure monitoring tools
 function setup_monitoring() {

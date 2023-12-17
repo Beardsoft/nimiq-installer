@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 
+#!/usr/bin/env python3
 
 import os
 import requests
@@ -7,8 +7,7 @@ import time
 import argparse
 import logging
 
-NIMIQ_NODE_URL = 'http://127.0.0.1:8648'
-EXTERNAL_API_URL = 'https://rpc.nimiqcloud.com/'
+NIMIQ_NODE_URL = 'http://node:8648'
 FACUET_URL = 'https://faucet.pos.nimiq-testnet.com/tapit'
 
 logging.basicConfig(level=logging.INFO,
@@ -16,34 +15,29 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%Y-%m-%d_%H:%M:%S',
                     handlers=[logging.StreamHandler()])
 
-def nimiq_request(method, params=None):
-    try:
-        response = requests.post(NIMIQ_NODE_URL, json={
-            "jsonrpc": "2.0",
-            "id": 1,
-            "method": method,
-            "params": params or [],
-        })
-        response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
+def nimiq_request(method, params=None, retries=3, delay=5):
+    while retries > 0:
+        try:
+            response = requests.post(NIMIQ_NODE_URL, json={
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": method,
+                "params": params or [],
+            })
+            response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
 
-        result = response.json().get('result', {})
-        if result is None:
-            raise ValueError("No result in response")
-        return result
+            result = response.json().get('result', {})
+            if result is None:
+                raise ValueError("No result in response")
+            return result
 
-    except requests.exceptions.HTTPError as errh:
-        logging.error("Http Error:", errh)
-    except requests.exceptions.ConnectionError as errc:
-        logging.error("Error Connecting:", errc)
-    except requests.exceptions.Timeout as errt:
-        logging.error("Timeout Error:", errt)
-    except requests.exceptions.RequestException as err:
-        logging.error("Error: Something went wrong with the request", err)
-    except ValueError as err:
-        logging.error("Error: Invalid response format", err)
+        except requests.exceptions.RequestException as err:
+            retries -= 1
+            logging.error(f"Error: {err}. Retrying in {delay} seconds. Retries left: {retries}")
+            time.sleep(delay)
 
+    logging.error("Request failed after multiple retries.")
     return None
-
 
 def get_private_key(file_path):
     with open(file_path, 'r') as f:
@@ -66,16 +60,22 @@ def needs_funds(address):
 def activate_validator(private_key_location):
     # Get address data
     res = nimiq_request("getAddress")
+    if res is None:
+        return
     ADDRESS = res['data']
-    logging.info("Address: %s", ADDRESS)
+    logging.info(f"Address: {ADDRESS}")
 
     res = nimiq_request("getSigningKey")
+    if res is None:
+        return
     SIGKEY = res['data']
-    logging.info("Signing Key: %s", SIGKEY)
+    logging.info(f"Signing Key: {SIGKEY}")
 
     res = nimiq_request("getVotingKey")
+    if res is None:
+        return
     VOTEKEY = res['data']
-    logging.info("Voting Key: %s", VOTEKEY)
+    logging.info(f"Voting Key: {VOTEKEY}")
 
     logging.info("Funding Nimiq address.")
     if needs_funds(ADDRESS):
@@ -98,7 +98,7 @@ def check_block_height():
     logging.info("Don't close this window!")
     while True:
         res = nimiq_request("isConsensusEstablished")
-        if res['data'] == True:
+        if res is not None and res.get('data') == True:
             logging.info("Consensus established.")
             break
         else:
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     logging.info('Nimiq validator activation script')
     logging.info(40 * '-')
     parser = argparse.ArgumentParser(description='Activate Validator')
-    parser.add_argument('--private-key', type=str, default="/opt/nimiq/secrets/address.txt" , help='Path to the private key file')
+    parser.add_argument('--private-key', type=str, default="/keys/address.txt", help='Path to the private key file')
     args = parser.parse_args()
     check_block_height()
     activate_validator(args.private_key)
