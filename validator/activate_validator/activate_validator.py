@@ -99,20 +99,21 @@ def activate_validator(private_key_location):
     nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", "0"])
     
     ACTIVATED_AMOUNT.labels(address=ADDRESS).set(1)  # Assuming amount activated is 1, adjust as needed
+    return ADDRESS
 
-def is_validator_active():
+def is_validator_active(address):
     res = nimiq_request("getActiveValidators")
     if res is None:
         return False
     active_validators = res.get('data', [])
-    return ADDRESS in active_validators
+    logging.info(json.dumps({"active_validators": active_validators}))
+    return address in active_validators
 
-def check_and_activate_validator(private_key_location):
-    if not is_validator_active():
+def check_and_activate_validator(private_key_location, address):
+    if not is_validator_active(address):
         activate_validator(private_key_location)
     else:
         logging.info("Validator already active.")
-
 
 def check_block_height():
     logging.info("Waiting for consensus to be established, this may take a while...")
