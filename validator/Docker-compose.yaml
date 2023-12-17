@@ -13,8 +13,8 @@ services:
       RPC_ENABLED: "true"
       NIMIQ_INSTANT_INBOUND: "true"
     volumes:
-      - "/opt/nimiq/configuration/client.toml:/home/nimiq/.nimiq/client.toml"
-      - "/opt/nimiq/data:/home/nimiq/.nimiq/testalbatross-full-consensus"
+      - "./client.toml:/home/nimiq/.nimiq/client.toml"
+      - "data:/home/nimiq/.nimiq"
     networks:
       - app_net
 
