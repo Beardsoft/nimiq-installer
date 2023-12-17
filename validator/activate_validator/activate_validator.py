@@ -14,6 +14,7 @@ FACUET_URL = 'https://faucet.pos.nimiq-testnet.com/tapit'
 
 # Prometheus Metrics
 ACTIVATED_AMOUNT = Gauge('nimiq_activated_amount', 'Amount activated', ['address'])
+ACTIVATE_EPOCH = Gauge('nimiq_activate_epoch', 'Epoch tried to activate validator')
 EPOCH_NUMBER = Gauge('nimiq_epoch_number', 'Epoch number')
 
 logging.basicConfig(level=logging.INFO,
@@ -24,13 +25,13 @@ logging.basicConfig(level=logging.INFO,
 def store_activation_epoch(epoch):
     with open("activation_epoch.txt", "w") as file:
         file.write(str(epoch))
+    ACTIVATE_EPOCH.set(epoch)
 
 def read_activation_epoch():
     if os.path.exists("activation_epoch.txt"):
         with open("activation_epoch.txt", "r") as file:
             return int(file.read().strip())
     return None
-
 
 def nimiq_request(method, params=None, retries=3, delay=5):
     while retries > 0:
@@ -143,10 +144,9 @@ def is_validator_active(address):
 def check_and_activate_validator(private_key_location, address):
     current_epoch = nimiq_request("getEpochNumber")['data']
     activation_epoch = read_activation_epoch()
-
-
     if activation_epoch is None or current_epoch > activation_epoch:
         if not is_validator_active(address):
+            logging.info("Activating validator.")
             activate_validator(private_key_location)
         else:
             logging.info("Validator already active.")
