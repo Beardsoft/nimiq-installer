@@ -96,13 +96,11 @@ def activate_validator(private_key_location):
     if res is None:
         return
     SIGKEY = res['data']
-    logging.info(f"Signing Key: {SIGKEY}")
 
     res = nimiq_request("getVotingKey")
     if res is None:
         return
     VOTEKEY = res['data']
-    logging.info(f"Voting Key: {VOTEKEY}")
 
     res = nimiq_request("getBlockNumber")
     if res is None:
