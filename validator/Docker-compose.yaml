@@ -44,7 +44,7 @@ services:
     build:
       context: ./activate_validator
     volumes:
-      - "/opt/nimiq/validator/keys:/secrets"
+      - "/opt/nimiq/validator/secrets:/keys"
     depends_on:
       - node
     restart: "no"
@@ -56,4 +56,4 @@ volumes:
 
 networks:
   app_net:
-    driver: bridge
+    external: true
