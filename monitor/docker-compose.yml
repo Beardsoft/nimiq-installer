@@ -39,11 +39,20 @@ services:
     ports:
       - "127.0.0.1:3100:3100"
     volumes:
-      - loki-storage:/loki
+      - loki-wal:/loki/wal
       - ./loki-config.yaml:/etc/loki/local-config.yaml
     command: -config.file=/etc/loki/local-config.yaml
     networks:
       - app_net
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - /var/log:/var/log
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./promtail-config.yaml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -56,6 +65,7 @@ services:
 volumes:
   grafana-storage:
   prometheus-storage:
+  loki-wal:
 
 networks:
   app_net:

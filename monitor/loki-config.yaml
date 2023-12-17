@@ -10,6 +10,7 @@ ingester:
       kvstore:
         store: inmemory
       replication_factor: 1
+  dir: /loki/wal
   chunk_idle_period: 1h       # Any chunk not receiving new logs in this time will be flushed
   chunk_block_size: 262144    # The amount of logs to accumulate before compacting and flushing to the store
   chunk_retain_period: 1m     # Must be greater than index read cache TTL if using an index cache (which is the default)
@@ -48,4 +49,4 @@ chunk_store_config:
 
 table_manager:
   retention_deletes_enabled: true
-  retention_period: 168h
+  retention_period: 180h
