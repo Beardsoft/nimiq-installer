@@ -199,14 +199,14 @@ function setup_validator_node() {
 
     # Generate the validator key if it doesn't exist
     cd "${work_dir}/gen_keys"
-    docker build -t nimiq-key-generator .
-    docker run --rm -v "${work_dir}/secrets:/keys" -u 0 nimiq-key-generator
+    docker build -t nimiq-key-generator . &>/dev/null
+    docker run --rm -v "${work_dir}/secrets:/keys" -u 0 nimiq-key-generator &>/dev/null
 
     # Define file paths for the keys
-    local address="${work_dir}/secrets/nimiq-address.txt"
-    local fee_key="${work_dir}/secrets/fee-key.txt"
-    local signing_key="${work_dir}/secrets/signing-key.txt"
-    local vote_key="${work_dir}/secrets/vote-key.txt"
+    local address="${work_dir}/secrets/address.txt"
+    local fee_key="${work_dir}/secrets/fee_key.txt"
+    local signing_key="${work_dir}/secrets/signing_key.txt"
+    local vote_key="${work_dir}/secrets/vote_key.txt"
     local configuration_file="${work_dir}/client.toml"
 
     # Read values from secret files
