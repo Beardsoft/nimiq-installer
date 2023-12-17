@@ -1,6 +1,6 @@
 # Nimiq installer
 
-This repo is to have a automated installer for a nimiq validator or RPC node with full history.
+This repo is to have a automated installer for a nimiq validator or RPC node with full node.
 
 Good to know is that it doesn't user permanent storage because Devnet is frequently restarted.
 
@@ -52,6 +52,9 @@ We use the following components
 - Node exporter
 - Loki
 - Promtail
+
+NOTE: You can switch off by setting the variable in the setup.sh file to false or 3rth variable to  false.
+
 
 You can customize any alerts or settings to your liking.
 

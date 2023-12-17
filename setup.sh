@@ -8,8 +8,9 @@ REPO_DIR="/opt/nimiq-installer"
 username="protocol"
 protocol_uid=1001
 network=${1:-testnet}
-node_type=${2:-full_node}
-version=${3:-improvements}  # Specify branch or tag if needed
+node_type=${2:-validator}
+monitor=${3:-true} 
+version=${4:-master}  # Specify branch or tag if needed
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -302,7 +303,11 @@ function main() {
         exit 1
     fi
 
-    setup_monitoring
+    if [ "$monitor" == "true" ]; then
+        setup_monitoring
+    else
+        echo -e "${YELLOW}Monitoring setup skipped.${NC}"
+    fi    
 
     echo -e "${GREEN}Nimiq V2 installation and monitoring setup completed successfully.${NC}"
 }
