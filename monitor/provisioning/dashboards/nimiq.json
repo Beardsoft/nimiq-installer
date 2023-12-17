@@ -401,7 +401,7 @@
           "useBackend": false
         }
       ],
-      "title": "Active validators",
+      "title": "Epoch",
       "type": "stat"
     },
     {
@@ -709,7 +709,7 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
+        "w": 3,
         "x": 18,
         "y": 1
       },
@@ -781,8 +781,8 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 1,
-        "x": 22,
+        "w": 2,
+        "x": 21,
         "y": 1
       },
       "id": 24,
@@ -821,7 +821,7 @@
           "useBackend": false
         }
       ],
-      "title": "Activated Epoch Number",
+      "title": "Activated Epoch",
       "type": "stat"
     },
     {
@@ -829,6 +829,7 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
+      "description": "Attempts of activation",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1566,7 +1567,7 @@
     "list": []
   },
   "time": {
-    "from": "now-3h",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},

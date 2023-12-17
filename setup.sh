@@ -275,7 +275,7 @@ function setup_monitoring() {
     sleep 5
     echo -e "${GREEN}Monitoring setup completed successfully.${NC}"
     echo -e "${YELLOW}Login with Username: admin and Password: nimiq.${NC}"
-    echo -e "${YELLOW}Use a secure password!${NC}"
+    echo -e "${YELLOW}Change password to a secure password!${NC}"
     echo -e "${GREEN}Grafana is running at: http://$public_ip/grafana${NC}"
 
 }
