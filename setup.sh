@@ -150,7 +150,7 @@ function setup_full_node() {
 
     # Navigate to the working directory and start the Docker container
     cd $work_dir
-    echo -e "${GREEN}Starting the Nimiq Full Nde Docker container...${NC}"
+    echo -e "${GREEN}Starting the Nimiq Full Node Docker container...${NC}"
 
     # Allow HTTP and HTTPS traffic
     ufw allow 80/tcp &>/dev/null
@@ -161,7 +161,6 @@ function setup_full_node() {
     echo -e "${GREEN}Nimiq Full Node setup complete.${NC}"
 }
 
-# Function to set up a validator node
 # Function to set up a validator node
 function setup_validator_node() {
     echo -e "${GREEN}Setting up Nimiq Validator Node...${NC}"
@@ -193,6 +192,11 @@ function setup_validator_node() {
     mkdir -p $work_dir
     cp $config_file "${work_dir}/client.toml"
 
+    # Copy Nginx configuration file if it exists
+    if [ -f "${config_dir}/nginx.conf" ]; then
+        cp "${config_dir}/nginx.conf" "${work_dir}/nginx.conf"
+    fi
+
     # Copy generated keys to the working directory
     cp -r "${config_dir}/gen_keys" "${work_dir}/gen_keys"
     mkdir -p "${work_dir}/secrets"
@@ -222,6 +226,7 @@ function setup_validator_node() {
     sed -i "s/CHANGE_SIGN_KEY/$SIGNING_KEY/g" $configuration_file
     sed -i "s/CHANGE_VOTE_KEY/$VOTING_KEY/g" $configuration_file
 
+
     # Copy validator activator script to the working directory
     cp -r "${config_dir}/activate_validator" "${work_dir}/activate_validator"
 
@@ -233,7 +238,7 @@ function setup_validator_node() {
 
     # Start the Docker container
     echo -e "${GREEN}Starting the Nimiq Validator Node Docker container...${NC}"
-    docker-compose up -d &>/dev/null
+    docker-compose up -d
 
     echo -e "${GREEN}Nimiq Validator Node setup complete.${NC}"
 }
