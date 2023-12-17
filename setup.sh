@@ -238,7 +238,7 @@ function setup_validator_node() {
 
     # Start the Docker container
     echo -e "${GREEN}Starting the Nimiq Validator Node Docker container...${NC}"
-    docker-compose up -d
+    docker-compose up -d &>/dev/null
 
     echo -e "${GREEN}Nimiq Validator Node setup complete.${NC}"
 }
@@ -274,7 +274,7 @@ function setup_monitoring() {
     echo -e "${GREEN}Wait few seconds before grafana is ready${NC}"
     sleep 5
     echo -e "${GREEN}Monitoring setup completed successfully.${NC}"
-    echo -e "${YELLOW}Login with Username: Admin and Password: Admin.${NC}"
+    echo -e "${YELLOW}Login with Username: admin and Password: nimiq.${NC}"
     echo -e "${YELLOW}Use a secure password!${NC}"
     echo -e "${GREEN}Grafana is running at: http://$public_ip/grafana${NC}"
 

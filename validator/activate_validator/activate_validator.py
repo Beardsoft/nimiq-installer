@@ -31,7 +31,6 @@ def nimiq_request(method, params=None, retries=3, delay=5):
                 "params": params or [],
             })
             response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
-
             result = response.json().get('result', {})
             if result is None:
                 raise ValueError("No result in response")
@@ -41,7 +40,6 @@ def nimiq_request(method, params=None, retries=3, delay=5):
             retries -= 1
             logging.error(f"Error: {err}. Retrying in {delay} seconds. Retries left: {retries}")
             time.sleep(delay)
-
     logging.error("Request failed after multiple retries.")
     return None
 
