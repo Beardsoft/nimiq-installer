@@ -1,0 +1,18 @@
+apiVersion: 1
+providers:
+  - name: Nimiq
+    orgId: 1
+    folder: ""
+    type: file
+    disableDeletion: true
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/nimiq.json
+  - name: Prometheus
+    orgId: 1
+    folder: ""
+    type: file
+    disableDeletion: true
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/prometheus.json

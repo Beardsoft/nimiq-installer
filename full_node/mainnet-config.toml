@@ -9,7 +9,7 @@ seed_nodes = [
 ]
 
 [consensus]
-sync_mode = "history"
+sync_mode = "full"
 network = "test-albatross"
 min_peers = 1
 
