@@ -12,7 +12,7 @@ ingester:
       kvstore:
         store: inmemory
       replication_factor: 1
-  chunk_idle_period: 1h       # Any chunk not receiving new logs in this time will be flushed
+  chunk_idle_period: 2h       # Any chunk not receiving new logs in this time will be flushed
   chunk_block_size: 262144    # The amount of logs to accumulate before compacting and flushing to the store
   chunk_retain_period: 1m     # Must be greater than index read cache TTL if using an index cache (which is the default)
   max_transfer_retries: 0     # Chunk transfers disabled

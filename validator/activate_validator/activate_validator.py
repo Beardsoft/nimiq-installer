@@ -177,4 +177,4 @@ if __name__ == '__main__':
         get_epoch_number()
         address = get_address()
         check_and_activate_validator(args.private_key, address)
-        time.sleep(3600)  # Wait for a minute before checking again
+        time.sleep(600)  # Wait for 10 minutes to check again.
