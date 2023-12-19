@@ -10,7 +10,7 @@ protocol_uid=1001
 network=${1:-testnet}
 node_type=${2:-validator}
 monitor=${3:-true} 
-version=${4:-master}  # Specify branch or tag if needed
+version=${4:-improvements}  # Specify branch or tag if needed
 
 # Colors for output
 GREEN='\033[0;32m'
