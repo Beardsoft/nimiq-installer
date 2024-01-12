@@ -5,7 +5,7 @@ username="protocol"
 protocol_uid=1001
 network=${1:-testnet}
 node_type=${2:-full_node}
-version=${3:-master}
+version=${3:-improvements}
 image="maestroi/nimiq-albatross:stable"
 
 # Colors
