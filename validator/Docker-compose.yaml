@@ -54,6 +54,24 @@ services:
     networks:
       - app_net
 
+  watchdog:
+    container_name: nimiq-watchdog
+    image: ghcr.io/maestroi/nimiq-watchdog:main
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 12345:12345
+    environment:
+      - NIMIQ_HOST=http://node
+      - NIMIQ_PORT=8648
+      - RETRY_LIMIT=10
+      - RETRY_DELAY=10
+      - RESTART_DELAY=300
+      - DOCKER_CONTAINER_NAME=node
+    restart: unless-stopped
+    networks:
+      - app_net
+
 volumes:
   data:
   epoch-data:
