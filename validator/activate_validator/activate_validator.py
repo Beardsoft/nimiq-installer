@@ -75,6 +75,14 @@ def get_private_key(file_path):
                 return line.split('Private Key:')[1].strip()
     return None
 
+def get_wallet_address(file_path):
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            if 'Address:' in line:
+                return line.split('Address:')[1].strip()
+    return None
+
 def get_vote_key(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
@@ -117,6 +125,8 @@ def get_epoch_number():
 def activate_validator(private_key_location):
     ADDRESS = get_address()
     logging.info(f"Address: {ADDRESS}")
+    
+    FEE_PUB_KEY = get_wallet_address('/keys/fee_key.txt')
 
     SIGKEY = get_public_key('/keys/signing_key.txt')
 
@@ -129,6 +139,12 @@ def activate_validator(private_key_location):
         requests.post(FACUET_URL, data={'address': ADDRESS})
     else:
         logging.info("Address already funded.")
+        
+    logging.info("funding fee key")
+    if needs_funds(FEE_PUB_KEY):
+        requests.post(FACUET_URL, data={'address': FEE_PUB_KEY})
+    else:
+        logging.info("Fee key already funded.")
 
     current_epoch = nimiq_request("getEpochNumber")['data']
     store_activation_epoch(current_epoch)

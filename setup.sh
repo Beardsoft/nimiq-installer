@@ -217,8 +217,8 @@ function setup_validator_node() {
     # Read values from secret files
     ADDRESS=$(cat $address | sed -n 's/Address:[[:space:]]*\(.*\)/\1/p')
     ADDRESS_PRIVATE=$(grep "Private Key:" $address | awk '{print $3}')
-    FEE_KEY=$(grep "Public Key:" $address | awk '{print $3}')
-    SIGNING_KEY=$(grep "Private Key:" $address | awk '{print $3}')
+    FEE_KEY=$(grep "Private Key:" $fee_key | awk '{print $3}')
+    SIGNING_KEY=$(grep "Private Key:" $signing_key | awk '{print $3}')
     VOTING_KEY=$(awk '/Secret Key:/{getline; getline; print}' $vote_key)
 
     # Update client.toml
