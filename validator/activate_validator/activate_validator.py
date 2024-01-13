@@ -93,6 +93,12 @@ def get_address():
         return None
     return res['data']
 
+def get_tx(tx_hash):
+    res = nimiq_request("getTransactionByHash", [tx_hash])
+    if res is None:
+        return None
+    return res['data']
+
 def get_epoch_number():
     res = nimiq_request("getEpochNumber")
     if res is None:
@@ -131,7 +137,10 @@ def activate_validator(private_key_location):
     nimiq_request("unlockAccount", [ADDRESS, '', 0])
 
     logging.info("Activate Validator")
-    nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 2, str(BLOCKNUMBER)])
+    result = nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 2, str(BLOCKNUMBER)])
+    
+    logging.info("Check Activate TX")
+    get_tx(result.get('data'))
 
     ACTIVATED_AMOUNT.labels(address=ADDRESS).inc()
     return ADDRESS
