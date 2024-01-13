@@ -97,6 +97,9 @@ def get_tx(tx_hash):
     res = nimiq_request("getTransactionByHash", [tx_hash])
     if res is None:
         return None
+    if res['error']:
+        logging.error(f"Error getting transaction: {res['error']['message']}")
+        return None
     return res['data']
 
 def get_epoch_number():
