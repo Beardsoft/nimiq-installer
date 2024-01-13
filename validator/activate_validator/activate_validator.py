@@ -59,12 +59,20 @@ def nimiq_request(method, params=None, retries=3, delay=5):
     logging.error("Request failed after multiple retries.")
     return None
 
-def get_private_key(file_path):
+def get_public_key(file_path):
     with open(file_path, 'r') as f:
         lines = f.readlines()
         for line in lines:
             if 'Public Key:' in line:
                 return line.split('Public Key:')[1].strip()
+    return None
+
+def get_private_key(file_path):
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            if 'Private Key:' in line:
+                return line.split('Private Key:')[1].strip()
     return None
 
 def get_vote_key(file_path):
@@ -112,7 +120,7 @@ def activate_validator(private_key_location):
     ADDRESS = get_address()
     logging.info(f"Address: {ADDRESS}")
 
-    SIGKEY = get_private_key('/keys/signing_key.txt')
+    SIGKEY = get_public_key('/keys/signing_key.txt')
 
     VOTEKEY = get_vote_key('/keys/vote_key.txt')
 

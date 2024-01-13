@@ -273,7 +273,7 @@ function setup_monitoring() {
 
     echo -e "${GREEN}Monitoring setup completed successfully.${NC}"
     echo -e "${GREEN}Wait few seconds before grafana is ready${NC}"
-    sleep 5
+    sleep 15
     echo -e "${GREEN}Monitoring setup completed successfully.${NC}"
     echo -e "${YELLOW}Login with Username: admin and Password: nimiq.${NC}"
     echo -e "${YELLOW}Change password to a secure password!${NC}"
