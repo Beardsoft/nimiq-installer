@@ -110,7 +110,7 @@ def activate_validator(private_key_location):
     res = nimiq_request("getBlockNumber")
     if res is None:
         return
-    BLOCKNUMBER = int(res['data'] + 5)
+    BLOCKNUMBER = int(res['data'] + 25)
     logging.info(f"Blocknumber: {BLOCKNUMBER}")
 
     ADDRESS_PRIVATE = get_private_key(private_key_location)
