@@ -116,7 +116,7 @@ def activate_validator(private_key_location):
 
     VOTEKEY = get_vote_key('/keys/vote_key.txt')
 
-    ADDRESS_PRIVATE = get_private_key('/keys/address.tx')
+    ADDRESS_PRIVATE = get_private_key('/keys/address.txt')
 
     logging.info("Funding Nimiq address.")
     if needs_funds(ADDRESS):
