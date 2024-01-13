@@ -160,13 +160,17 @@ def check_and_activate_validator(private_key_location, address):
 
 def check_block_height():
     logging.info("Waiting for consensus to be established, this may take a while...")
-    while True:
+    consensus_count = 0
+    while consensus_count < 3:
         res = nimiq_request("isConsensusEstablished")
         if res is not None and res.get('data') == True:
-            logging.info("Consensus established.")
-            break
+            consensus_count += 1
+            logging.info(f"Consensus established {consensus_count} time(s).")
         else:
-            time.sleep(5)
+            consensus_count = 0
+            logging.info("Consensus not established yet.")
+        time.sleep(5)
+    logging.info("Consensus confirmed 3 times.")
 
 if __name__ == '__main__':
     start_http_server(8000)  # Start Prometheus client
