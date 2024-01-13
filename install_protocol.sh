@@ -86,7 +86,7 @@ function install_full_node() {
 function install_validator() {
     # Set variables
     address="/opt/nimiq/secrets/address.txt"
-    fee_key="/opt/nimiq/secrets/address.txt"
+    fee_key="/opt/nimiq/secrets/fee_key.txt"
     signing_key="/opt/nimiq/secrets/signing_key.txt"
     vote_key="/opt/nimiq/secrets/vote_key.txt"
 
@@ -127,7 +127,7 @@ function install_validator() {
     # Read values from /opt/nimiq/secrets/nimiq-address.txt
     ADDRESS=$(cat $address | sed -n 's/Address:[[:space:]]*\(.*\)/\1/p')
     ADDRESS_PRIVATE=$(grep "Private Key:" $address | awk '{print $3}')
-    FEE_KEY=$(grep "Private Key:" $fee_key | awk '{print $3}')
+    FEE_KEY=$(grep "Private Key:" $address | awk '{print $3}')
     SIGNING_KEY=$(grep "Private Key:" $signing_key | awk '{print $3}')
     VOTING_KEY=$(awk '/Secret Key:/{getline; getline; print}' $vote_key)
 
