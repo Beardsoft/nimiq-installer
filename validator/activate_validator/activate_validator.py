@@ -112,7 +112,7 @@ def activate_validator(private_key_location):
     ADDRESS = get_address()
     logging.info(f"Address: {ADDRESS}")
 
-    SIGKEY = get_private_key('/keys/signing_key.txt')
+    SIGKEY = get_private_key('/keys/address.txt')
 
     VOTEKEY = get_vote_key('/keys/vote_key.txt')
 
