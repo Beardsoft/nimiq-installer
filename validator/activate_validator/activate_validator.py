@@ -17,7 +17,7 @@ ACTIVATED_AMOUNT = Gauge('nimiq_activated_amount', 'Amount activated', ['address
 ACTIVATE_EPOCH = Gauge('nimiq_activate_epoch', 'Epoch tried to activate validator')
 EPOCH_NUMBER = Gauge('nimiq_epoch_number', 'Epoch number')
 
-logging.basicConfig(level=logging.INFO,
+logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s — %(message)s',
                     datefmt='%Y-%m-%d_%H:%M:%S',
                     handlers=[logging.StreamHandler()])
@@ -36,7 +36,8 @@ def read_activation_epoch():
 def nimiq_request(method, params=None, retries=3, delay=5):
     while retries > 0:
         try:
-            logging.info(method, params)
+            logging.debug(method)
+            logging.debug(params)
             response = requests.post(NIMIQ_NODE_URL, json={
                 "jsonrpc": "2.0",
                 "id": 1,
@@ -44,7 +45,7 @@ def nimiq_request(method, params=None, retries=3, delay=5):
                 "params": params or [],
             })
             response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
-            logging.info(response.json())
+            logging.debug(response.json())
             result = response.json().get('result', {})
             time.sleep(0.5) # Wait for 0.5 second to not overload the node.
             if result is None:
