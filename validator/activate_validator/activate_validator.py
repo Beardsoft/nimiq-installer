@@ -63,8 +63,8 @@ def get_private_key(file_path):
     with open(file_path, 'r') as f:
         lines = f.readlines()
         for line in lines:
-            if 'Private Key:' in line:
-                return line.split('Private Key:')[1].strip()
+            if 'Public Key:' in line:
+                return line.split('Public Key:')[1].strip()
     return None
 
 def get_vote_key(file_path):
@@ -72,7 +72,7 @@ def get_vote_key(file_path):
         lines = file.readlines()
 
     for i in range(len(lines)):
-        if "Secret Key:" in lines[i]:
+        if "Public Key:" in lines[i]:
             secret_key = lines[i+2].strip()  # The secret key is two lines down
 
     return secret_key
@@ -112,11 +112,11 @@ def activate_validator(private_key_location):
     ADDRESS = get_address()
     logging.info(f"Address: {ADDRESS}")
 
-    SIGKEY = get_private_key('/keys/address.txt')
+    SIGKEY = get_private_key('/keys/signing_key.txt')
 
     VOTEKEY = get_vote_key('/keys/vote_key.txt')
 
-    ADDRESS_PRIVATE = get_private_key(private_key_location)
+    ADDRESS_PRIVATE = get_private_key('/keys/address.tx')
 
     logging.info("Funding Nimiq address.")
     if needs_funds(ADDRESS):
@@ -136,6 +136,7 @@ def activate_validator(private_key_location):
     logging.info("Activate Validator")
     result = nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 500, "+0"])
     
+    time.sleep(30) # Wait before checking the transaction
     logging.info("Check Activate TX")
     get_tx(result.get('data'))
 
