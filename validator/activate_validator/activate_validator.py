@@ -45,8 +45,9 @@ def nimiq_request(method, params=None, retries=3, delay=5):
                 "params": params or [],
             })
             response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
-            logging.debug(response.json())
+            logging.info(response.json())
             result = response.json().get('result', {})
+            time.sleep(0.5) # Wait for 0.5 second to not overload the node.
             if result is None:
                 raise ValueError("No result in response")
             return result
