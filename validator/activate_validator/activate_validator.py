@@ -116,12 +116,6 @@ def activate_validator(private_key_location):
 
     VOTEKEY = get_vote_key('/keys/vote_key.txt')
 
-    res = nimiq_request("getBlockNumber")
-    if res is None:
-        return
-    BLOCKNUMBER = int(res['data'] - 25)
-    logging.info(f"Blocknumber: {BLOCKNUMBER}")
-
     ADDRESS_PRIVATE = get_private_key(private_key_location)
 
     logging.info("Funding Nimiq address.")
@@ -140,7 +134,7 @@ def activate_validator(private_key_location):
     nimiq_request("unlockAccount", [ADDRESS, '', 0])
 
     logging.info("Activate Validator")
-    result = nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 2, str(BLOCKNUMBER)])
+    result = nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 2, "+0"])
     
     logging.info("Check Activate TX")
     get_tx(result.get('data'))
