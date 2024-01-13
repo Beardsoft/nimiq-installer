@@ -110,7 +110,7 @@ def activate_validator(private_key_location):
     res = nimiq_request("getBlockNumber")
     if res is None:
         return
-    BLOCKNUMBER = str(res['data'])
+    BLOCKNUMBER = int(res['data'] + 5)
     logging.info(f"Blocknumber: {BLOCKNUMBER}")
 
     ADDRESS_PRIVATE = get_private_key(private_key_location)
@@ -131,7 +131,7 @@ def activate_validator(private_key_location):
     nimiq_request("unlockAccount", [ADDRESS, '', 0])
 
     logging.info("Activate Validator")
-    nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 2, BLOCKNUMBER])
+    nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 2, str(BLOCKNUMBER)])
 
     ACTIVATED_AMOUNT.labels(address=ADDRESS).inc()
     return ADDRESS
