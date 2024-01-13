@@ -134,7 +134,7 @@ def activate_validator(private_key_location):
     nimiq_request("unlockAccount", [ADDRESS, '', 0])
 
     logging.info("Activate Validator")
-    result = nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 2, "+0"])
+    result = nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 500, "+0"])
     
     logging.info("Check Activate TX")
     get_tx(result.get('data'))
