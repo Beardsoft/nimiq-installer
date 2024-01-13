@@ -36,8 +36,7 @@ def read_activation_epoch():
 def nimiq_request(method, params=None, retries=3, delay=5):
     while retries > 0:
         try:
-            logging.debug(method)
-            logging.debug(params)
+            logging.info(method, params)
             response = requests.post(NIMIQ_NODE_URL, json={
                 "jsonrpc": "2.0",
                 "id": 1,
@@ -67,6 +66,16 @@ def get_private_key(file_path):
                 return line.split('Private Key:')[1].strip()
     return None
 
+def get_vote_key(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    for i in range(len(lines)):
+        if "Secret Key:" in lines[i]:
+            secret_key = lines[i+2].strip()  # The secret key is two lines down
+
+    return secret_key
+
 def needs_funds(address):
     res = nimiq_request("getAccountByAddress", [address])
     if res is None:
@@ -93,15 +102,9 @@ def activate_validator(private_key_location):
     ADDRESS = get_address()
     logging.info(f"Address: {ADDRESS}")
 
-    res = nimiq_request("getSigningKey")
-    if res is None:
-        return
-    SIGKEY = res['data']
+    SIGKEY = get_private_key('/keys/signing_key.txt')
 
-    res = nimiq_request("getVotingKey")
-    if res is None:
-        return
-    VOTEKEY = res['data']
+    VOTEKEY = get_vote_key('/keys/vote_key.txt')
 
     res = nimiq_request("getBlockNumber")
     if res is None:
