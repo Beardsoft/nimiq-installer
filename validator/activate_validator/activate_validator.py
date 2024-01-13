@@ -64,7 +64,7 @@ def get_public_key(file_path):
         lines = f.readlines()
         for line in lines:
             if 'Private Key:' in line:
-                return line.split('Public Key:')[1].strip()
+                return line.split('Private Key:')[1].strip()
     return None
 
 def get_private_key(file_path):
