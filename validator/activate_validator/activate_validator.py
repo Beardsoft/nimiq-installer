@@ -63,7 +63,7 @@ def get_public_key(file_path):
     with open(file_path, 'r') as f:
         lines = f.readlines()
         for line in lines:
-            if 'Public Key:' in line:
+            if 'Private Key:' in line:
                 return line.split('Public Key:')[1].strip()
     return None
 
@@ -80,7 +80,7 @@ def get_vote_key(file_path):
         lines = file.readlines()
 
     for i in range(len(lines)):
-        if "Public Key:" in lines[i]:
+        if "Private Key:" in lines[i]:
             secret_key = lines[i+2].strip()  # The secret key is two lines down
 
     return secret_key

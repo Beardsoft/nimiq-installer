@@ -26,7 +26,7 @@ Be aware executing things directly in terminal as root, check the files first!
 
 ## Full node
 ```bash
-curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/setup.sh| bash -s testnet full_node
+curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/setup.sh | bash -s testnet full_node
 ``` 
 
 ## Validator

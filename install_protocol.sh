@@ -86,7 +86,7 @@ function install_full_node() {
 function install_validator() {
     # Set variables
     address="/opt/nimiq/secrets/address.txt"
-    fee_key="/opt/nimiq/secrets/fee_key.txt"
+    fee_key="/opt/nimiq/secrets/address.txt"
     signing_key="/opt/nimiq/secrets/signing_key.txt"
     vote_key="/opt/nimiq/secrets/vote_key.txt"
 
