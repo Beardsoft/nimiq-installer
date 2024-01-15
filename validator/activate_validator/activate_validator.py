@@ -125,7 +125,6 @@ def push_raw_tx(tx_hash):
         return None
     logging.info(f"Transaction: {res}")
 
-
 def get_epoch_number():
     res = nimiq_request("getEpochNumber")
     if res is None:
@@ -160,11 +159,11 @@ def activate_validator(private_key_location):
     nimiq_request("unlockAccount", [ADDRESS, '', 0])
 
     logging.info("Activate Validator")
-    result = nimiq_request("sendNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 500, "+0"])
+    result = nimiq_request("createNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 500, "+0"])
     
     time.sleep(30) # Wait before checking the transaction
     logging.info("Check Activate TX")
-    get_tx(result.get('data'))
+    push_raw_tx(result.get('data'))
 
     ACTIVATED_AMOUNT.labels(address=ADDRESS).inc()
     return ADDRESS
