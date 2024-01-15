@@ -4,13 +4,13 @@ import os
 import requests
 import json
 import time
-import argparse
 import logging
 from prometheus_client import start_http_server, Gauge
 
-
-NIMIQ_NODE_URL = 'http://node:8648'
-FACUET_URL = 'https://faucet.pos.nimiq-testnet.com/tapit'
+NIMIQ_NODE_URL  = os.getenv('NIMIQ_NODE_URL', 'http://node:8648')
+NIMIQ_NETWORK   = os.getenv('NIMIQ_NETWORK', 'testnet')
+FACUET_URL      = os.getenv('FACUET_URL','https://faucet.pos.nimiq-testnet.com/tapit')
+PROMETHEUS_PORT = os.getenv('PROMETHEUS_PORT', 8000)
 
 # Prometheus Metrics
 ACTIVATED_AMOUNT = Gauge('nimiq_activated_amount', 'Amount activated', ['address'])
@@ -132,6 +132,21 @@ def get_epoch_number():
         return None
     EPOCH_NUMBER.set(res['data'])
 
+def wait_for_enough_stake(ADDRESS):
+    while True:
+        res = nimiq_request("getAccountByAddress", [ADDRESS])
+        if res is not None and 'data' in res and 'balance' in res['data']:
+            balance = res['data']['balance'] / 1e6  # Convert to NIM
+            if balance >= 100000:  # Check if balance is at least 100k NIM
+                logging.info(f"Balance reached: {balance} NIM.")
+                break
+            else:
+                logging.info(f"Current balance: {balance} NIM. Waiting for balance to reach 100k NIM.")
+        else:
+            logging.error("Error getting balance.")
+        time.sleep(60)  # Wait for 1 minute
+
+
 def activate_validator(private_key_location):
     ADDRESS = get_address()
     logging.info(f"Address: {ADDRESS}")
@@ -159,11 +174,13 @@ def activate_validator(private_key_location):
     logging.info("Unlock Account.")
     nimiq_request("unlockAccount", [ADDRESS, '', 0])
 
+    logging.info("Wait for enough stake.")
+    wait_for_enough_stake(ADDRESS)
+
     logging.info("Activate Validator")
     result = nimiq_request("createNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 500, "+0"])
     
-    time.sleep(30) # Wait before checking the transaction
-    logging.info("Check Activate TX")
+    logging.info("Pushing transaction")
     push_raw_tx(result.get('data'))
 
     ACTIVATED_AMOUNT.labels(address=ADDRESS).inc()
@@ -206,17 +223,13 @@ def check_block_height():
     logging.info("Consensus confirmed 3 times.")
 
 if __name__ == '__main__':
-    start_http_server(8000)  # Start Prometheus client
-    logging.info(40 * '-')
-    logging.info('Nimiq validator activation script')
-    logging.info(40 * '-')
-    parser = argparse.ArgumentParser(description='Activate Validator')
-    parser.add_argument('--private-key', type=str, default="/keys/address.txt", help='Path to the private key file')
-    args = parser.parse_args()
+    logging.info("Starting  validator activation script...")
+    logging.info(f"Version: 0.2.0 ")
+    start_http_server(int(PROMETHEUS_PORT))  # Start Prometheus client
     # Run indefinitely
     while True:
         check_block_height()
         get_epoch_number()
         address = get_address()
-        check_and_activate_validator(args.private_key, address)
+        check_and_activate_validator(address)
         time.sleep(600)  # Wait for 10 minutes to check again.
