@@ -45,6 +45,11 @@ private keys are located on the node in the following location address.txt, is t
 /opt/nimiq/validator/secrets
 ```
 
+All keys should also be zipped and located in, make sure you backup them!
+```bash
+./root/secrets.zip
+```
+
 # Use cloud-config
 make sure you tag validator or full node
 You can use the cloud config for any populair cloud provider to use for startup any node

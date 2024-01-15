@@ -88,7 +88,7 @@ function install_docker() {
 function install_packages() {
     echo -e "${GREEN}Installing packages...${NC}"
     apt-get update &>/dev/null
-    apt-get install -y curl jq libjq1 libonig5 git ufw fail2ban &>/dev/null
+    apt-get install -y curl jq libjq1 libonig5 git ufw fail2ban zip &>/dev/null
     echo -e "${GREEN}Package installation complete.${NC}"
 }
 
@@ -110,6 +110,15 @@ function setup_user() {
         id -u $username &>/dev/null || useradd -r -m -u $protocol_uid -g $protocol_uid -s /usr/sbin/nologin $username
     fi
 
+}
+
+function zip_secrets() {
+    zip -r /root/secrets.zip /opt/nimiq/validator/secrets
+    if [ $? -eq 0 ]; then
+        echo "File /root/secrets.zip created successfully."
+    else
+        echo "Failed to create file /root/secrets.zip."
+    fi
 }
 
 # Function to set up a full node
@@ -150,6 +159,9 @@ function setup_full_node() {
     if [ -f "${config_dir}/nginx.conf" ]; then
         cp "${config_dir}/nginx.conf" "${work_dir}/nginx.conf"
     fi
+
+    # Zipping secrets
+    zip_secrets
 
     # Navigate to the working directory and start the Docker container
     cd $work_dir
