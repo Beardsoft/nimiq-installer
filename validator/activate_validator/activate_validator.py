@@ -16,6 +16,9 @@ PROMETHEUS_PORT = os.getenv('PROMETHEUS_PORT', 8000)
 ACTIVATED_AMOUNT = Gauge('nimiq_activated_amount', 'Amount activated', ['address'])
 ACTIVATE_EPOCH = Gauge('nimiq_activate_epoch', 'Epoch tried to activate validator')
 EPOCH_NUMBER = Gauge('nimiq_epoch_number', 'Epoch number')
+CURRENT_BALANCE = Gauge('nimiq_current_balance', 'Current balance')
+TOTAL_STAKE = Gauge('nimiq_validator_total_stake', 'Total amount of stake')
+CURRENT_STAKERS = Gauge('nimiq_validator_current_stakers', 'Current amount of stakers')
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s — %(message)s',
@@ -132,11 +135,41 @@ def get_epoch_number():
         return None
     EPOCH_NUMBER.set(res['data'])
 
+def set_balance_prometheus(address):
+    balance = get_balance(address)
+    if balance is not None:
+        balance = balance / 1e5  # Convert to NIM
+        CURRENT_BALANCE.set(balance)
+    else:
+        logging.error("Error getting balance.")
+    return balance
+
+def get_stake_by_address(address):
+    res = nimiq_request("getValidatorByAddress", [address])
+    if res is not None and 'data' in res:
+        balance = res['data'].get('balance', 0) / 1e5  # Convert to NIM
+        num_stakers = res['data'].get('numStakers', 0)
+        CURRENT_BALANCE.set(balance)
+        CURRENT_STAKERS.set(num_stakers)
+    else:
+        logging.error("Error getting stake information.")
+    return balance, num_stakers
+
+def get_balance(address):
+    res = nimiq_request("getAccountByAddress", [address])
+    if res is None:
+        return None
+    if 'error' in res:
+        logging.error(f"Error getting balance: {res['error']['message']}")
+        return None
+    return res['data']['balance']
+
 def wait_for_enough_stake(ADDRESS):
     while True:
-        res = nimiq_request("getAccountByAddress", [ADDRESS])
-        if res is not None and 'data' in res and 'balance' in res['data']:
-            balance = res['data']['balance'] / 1e6  # Convert to NIM
+        balance = get_balance(ADDRESS)
+        if balance is not None:
+            balance = balance / 1e5  # Convert to NIM
+            CURRENT_BALANCE.set(balance)
             if balance >= 100000:  # Check if balance is at least 100k NIM
                 logging.info(f"Balance reached: {balance} NIM.")
                 break
@@ -146,6 +179,18 @@ def wait_for_enough_stake(ADDRESS):
             logging.error("Error getting balance.")
         time.sleep(60)  # Wait for 1 minute
 
+def monitor_active_validator(address):
+    while True:
+        if is_validator_active(address):
+            logging.info("Validator still active.")
+            set_balance_prometheus(address)
+            get_epoch_number()
+            
+            
+        else:
+            logging.info("Validator not active anymore.")
+            break
+        time.sleep(60)  # Wait for 1 minute
 
 def activate_validator():
     ADDRESS = get_address()
@@ -203,6 +248,7 @@ def check_and_activate_validator(address):
             activate_validator()
         else:
             logging.info("Validator already active.")
+            monitor_active_validator(address)
     else:
         next_epoch = activation_epoch + 1
         logging.info(f"Next epoch to activate validator: {next_epoch}")
