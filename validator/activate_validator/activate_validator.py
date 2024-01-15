@@ -147,7 +147,7 @@ def wait_for_enough_stake(ADDRESS):
         time.sleep(60)  # Wait for 1 minute
 
 
-def activate_validator(private_key_location):
+def activate_validator():
     ADDRESS = get_address()
     logging.info(f"Address: {ADDRESS}")
     
@@ -194,13 +194,13 @@ def is_validator_active(address):
     logging.info(json.dumps({"active_validators": active_validators}))
     return address in active_validators
 
-def check_and_activate_validator(private_key_location, address):
+def check_and_activate_validator(address):
     current_epoch = nimiq_request("getEpochNumber")['data']
     activation_epoch = read_activation_epoch()
     if activation_epoch is None or current_epoch > activation_epoch:
         if not is_validator_active(address):
             logging.info("Activating validator.")
-            activate_validator(private_key_location)
+            activate_validator()
         else:
             logging.info("Validator already active.")
     else:
