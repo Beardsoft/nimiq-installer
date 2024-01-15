@@ -117,7 +117,7 @@ def get_tx(tx_hash):
     logging.info(f"Transaction: {res}")
 
 def push_raw_tx(tx_hash):
-    res = nimiq_request("sendRawTransaction", [tx_hash])
+    res = nimiq_request("pushRawTransaction", [tx_hash])
     if res is None:
         return None
     if 'error' in res:
