@@ -116,6 +116,16 @@ def get_tx(tx_hash):
         return None
     logging.info(f"Transaction: {res}")
 
+def push_raw_tx(tx_hash):
+    res = nimiq_request("sendRawTransaction", [tx_hash])
+    if res is None:
+        return None
+    if 'error' in res:
+        logging.error(f"Error pushing transaction: {res['error']['message']}")
+        return None
+    logging.info(f"Transaction: {res}")
+
+
 def get_epoch_number():
     res = nimiq_request("getEpochNumber")
     if res is None:
@@ -139,12 +149,6 @@ def activate_validator(private_key_location):
         requests.post(FACUET_URL, data={'address': ADDRESS})
     else:
         logging.info("Address already funded.")
-        
-    logging.info("funding fee key")
-    if needs_funds(FEE_PUB_KEY):
-        requests.post(FACUET_URL, data={'address': FEE_PUB_KEY})
-    else:
-        logging.info("Fee key already funded.")
 
     current_epoch = nimiq_request("getEpochNumber")['data']
     store_activation_epoch(current_epoch)
