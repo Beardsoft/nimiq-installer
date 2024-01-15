@@ -12,6 +12,8 @@ node_type=${2:-validator}
 monitor=${3:-true} 
 version=${4:-improvements}  # Specify branch or tag if needed
 
+GEN_KEYS_DOCKER_IMAGE="ghcr.io/maestroi/nimiq-key-generator:main"
+
 # Colors for output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -198,15 +200,12 @@ function setup_validator_node() {
         cp "${config_dir}/nginx.conf" "${work_dir}/nginx.conf"
     fi
 
-    # Copy generated keys to the working directory
-    cp -r "${config_dir}/gen_keys" "${work_dir}/gen_keys"
+    # Create the secrets directory
     mkdir -p "${work_dir}/secrets"
 
     # Generate the validator key if it doesn't exist
-    cd "${work_dir}/gen_keys"
-    docker build -t nimiq-key-generator . &>/dev/null
-    docker run --rm -v "${work_dir}/secrets:/keys" -u 0 nimiq-key-generator &>/dev/null
-
+    docker run --rm -v "${work_dir}/secrets:/keys" -u 0 ${GEN_KEYS_DOCKER_IMAGE} &>/dev/null
+    
     # Define file paths for the keys
     local address="${work_dir}/secrets/address.txt"
     local fee_key="${work_dir}/secrets/fee_key.txt"

@@ -37,7 +37,14 @@ you can always check nimstats.com!
 
 ```bash
 curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/setup.sh | bash -s testnet validator
-``` 
+```
+
+# Private keys!
+private keys are located on the node in the following location address.txt, is the important address where your funds are staked on.
+```bash
+/opt/nimiq/validator/secrets
+```
+
 # Use cloud-config
 make sure you tag validator or full node
 You can use the cloud config for any populair cloud provider to use for startup any node
@@ -54,7 +61,6 @@ We use the following components
 - Promtail
 
 NOTE: You can switch off by setting the variable in the setup.sh file to false or 3rth variable to  false.
-
 
 You can customize any alerts or settings to your liking.
 
