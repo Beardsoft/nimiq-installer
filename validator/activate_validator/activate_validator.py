@@ -20,7 +20,7 @@ CURRENT_BALANCE = Gauge('nimiq_current_balance', 'Current balance')
 TOTAL_STAKE = Gauge('nimiq_validator_total_stake', 'Total amount of stake')
 CURRENT_STAKERS = Gauge('nimiq_validator_current_stakers', 'Current amount of stakers')
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s — %(message)s',
                     datefmt='%Y-%m-%d_%H:%M:%S',
                     handlers=[logging.StreamHandler()])
@@ -119,15 +119,15 @@ def get_tx(tx_hash):
         return None
     logging.info(f"Transaction: {res}")
 
-def push_raw_tx(tx_hash):
-    res = nimiq_request("pushTransaction", [tx_hash])
+def send_raw_tx(tx_hash):
+    res = nimiq_request("sendRawTransaction", [tx_hash])
     logging.info(f"Transaction: {res}")
     if res is None:
         return None
     if 'error' in res:
         logging.error(f"Error pushing transaction: {res['error']['message']}")
         return None
-    logging.info(f"Transaction: {res}")
+    logging.info(f"Transaction send: {res}")
 
 def get_epoch_number():
     res = nimiq_request("getEpochNumber")
@@ -225,8 +225,8 @@ def activate_validator():
     logging.info("Activate Validator")
     result = nimiq_request("createNewValidatorTransaction", [ADDRESS, ADDRESS, SIGKEY, VOTEKEY, ADDRESS, "", 500, "+0"])
     
-    logging.info("Pushing transaction")
-    push_raw_tx(result.get('data'))
+    logging.info("Sending Transaction")
+    send_raw_tx(result.get('data'))
 
     ACTIVATED_AMOUNT.labels(address=ADDRESS).inc()
     return ADDRESS

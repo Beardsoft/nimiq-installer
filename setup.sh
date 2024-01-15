@@ -223,10 +223,9 @@ function setup_validator_node() {
 
     # Update client.toml
     sed -i "s/CHANGE_VALIDATOR_ADDRESS/$ADDRESS/g" $configuration_file
-    sed -i "s/CHANGE_FEE_KEY/$FEE_KEY/g" $configuration_file
+    sed -i "s/CHANGE_FEE_KEY/$ADDRESS_PRIVATE/g" $configuration_file
     sed -i "s/CHANGE_SIGN_KEY/$SIGNING_KEY/g" $configuration_file
     sed -i "s/CHANGE_VOTE_KEY/$VOTING_KEY/g" $configuration_file
-
 
     # Copy validator activator script to the working directory
     cp -r "${config_dir}/activate_validator" "${work_dir}/activate_validator"
