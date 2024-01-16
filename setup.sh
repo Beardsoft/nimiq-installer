@@ -113,7 +113,7 @@ function setup_user() {
 }
 
 function zip_secrets() {
-    zip -r /root/secrets.zip /opt/nimiq/validator/secrets
+    zip -r /root/secrets.zip /opt/nimiq/validator/secrets &>/dev/null
     if [ $? -eq 0 ]; then
         echo "File /root/secrets.zip created successfully."
     else
@@ -237,7 +237,7 @@ function setup_validator_node() {
 
     # Zipping secrets
     echo -e "${GREEN}Zipping secrets...${NC}"
-    zip_secrets &>/dev/null
+    zip_secrets 
 
     # Copy Docker-compose file and other necessary files
     cp "${config_dir}/Docker-compose.yaml" "${work_dir}/docker-compose.yaml"
