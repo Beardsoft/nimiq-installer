@@ -160,9 +160,6 @@ function setup_full_node() {
         cp "${config_dir}/nginx.conf" "${work_dir}/nginx.conf"
     fi
 
-    # Zipping secrets
-    zip_secrets
-
     # Navigate to the working directory and start the Docker container
     cd $work_dir
     echo -e "${GREEN}Starting the Nimiq Full Node Docker container...${NC}"
@@ -237,6 +234,10 @@ function setup_validator_node() {
     sed -i "s/CHANGE_FEE_KEY/$ADDRESS_PRIVATE/g" $configuration_file
     sed -i "s/CHANGE_SIGN_KEY/$SIGNING_KEY/g" $configuration_file
     sed -i "s/CHANGE_VOTE_KEY/$VOTING_KEY/g" $configuration_file
+
+    # Zipping secrets
+    echo -e "${GREEN}Zipping secrets...${NC}"
+    zip_secrets
 
     # Copy Docker-compose file and other necessary files
     cp "${config_dir}/Docker-compose.yaml" "${work_dir}/docker-compose.yaml"
