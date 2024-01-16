@@ -26,7 +26,11 @@ Be aware executing things directly in terminal as root, check the files first!
 
 ## Full node
 ```bash
+<<<<<<< HEAD
+curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/setup.sh | bash -s testnet full_node
+=======
 curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/setup.sh| bash -s testnet full_node
+>>>>>>> 89c7da56285b6afcdacc5a058c53c501be9082ab
 ``` 
 
 ## Validator
@@ -37,7 +41,23 @@ you can always check nimstats.com!
 
 ```bash
 curl -s https://raw.githubusercontent.com/maestroi/nimiq-installer/master/setup.sh | bash -s testnet validator
+<<<<<<< HEAD
+```
+
+# Private keys!
+private keys are located on the node in the following location address.txt, is the important address where your funds are staked on.
+```bash
+/opt/nimiq/validator/secrets
+```
+
+All keys should also be zipped and located in, make sure you backup them!
+```bash
+./root/secrets.zip
+```
+
+=======
 ``` 
+>>>>>>> 89c7da56285b6afcdacc5a058c53c501be9082ab
 # Use cloud-config
 make sure you tag validator or full node
 You can use the cloud config for any populair cloud provider to use for startup any node
@@ -55,7 +75,10 @@ We use the following components
 
 NOTE: You can switch off by setting the variable in the setup.sh file to false or 3rth variable to  false.
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 89c7da56285b6afcdacc5a058c53c501be9082ab
 You can customize any alerts or settings to your liking.
 
 # Made possible by Maestro and Acestaking

@@ -17,6 +17,8 @@ services:
       - "data:/home/nimiq/.nimiq"
     networks:
       - app_net
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
   nginx:
     container_name: nginx
@@ -28,12 +30,14 @@ services:
       - "./nginx.conf:/etc/nginx/conf.d/default.conf"
     networks:
       - app_net
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
   watchtower:
     container_name: watchtower
     image: containrrr/watchtower
     restart: always
-    command: --interval 1800 node
+    command: --label-enable --interval 10800
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
@@ -41,11 +45,9 @@ services:
 
   activate_validator:
     container_name: activate_validator
-    build:
-      context: ./activate_validator
+    image: ghcr.io/maestroi/nimiq-validator-activator:main
     volumes:
       - "/opt/nimiq/validator/secrets:/keys"
-      - "epoch-data:/usr/src/app"
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
@@ -53,10 +55,31 @@ services:
     restart: unless-stopped
     networks:
       - app_net
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  watchdog:
+    container_name: nimiq-watchdog
+    image: ghcr.io/maestroi/nimiq-watchdog:main
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 12345:12345
+    environment:
+      - NIMIQ_HOST=http://node
+      - NIMIQ_PORT=8648
+      - RETRY_LIMIT=10
+      - RETRY_DELAY=10
+      - RESTART_DELAY=300
+      - DOCKER_CONTAINER_NAME=node
+    restart: unless-stopped
+    networks:
+      - app_net
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
 volumes:
   data:
-  epoch-data:
 
 networks:
   app_net:

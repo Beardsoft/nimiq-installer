@@ -12,6 +12,8 @@ node_type=${2:-validator}
 monitor=${3:-true} 
 version=${4:-master}  # Specify branch or tag if needed
 
+GEN_KEYS_DOCKER_IMAGE="ghcr.io/maestroi/nimiq-key-generator:main"
+
 # Colors for output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -86,7 +88,7 @@ function install_docker() {
 function install_packages() {
     echo -e "${GREEN}Installing packages...${NC}"
     apt-get update &>/dev/null
-    apt-get install -y curl jq libjq1 libonig5 git ufw fail2ban &>/dev/null
+    apt-get install -y curl jq libjq1 libonig5 git ufw fail2ban zip &>/dev/null
     echo -e "${GREEN}Package installation complete.${NC}"
 }
 
@@ -108,6 +110,15 @@ function setup_user() {
         id -u $username &>/dev/null || useradd -r -m -u $protocol_uid -g $protocol_uid -s /usr/sbin/nologin $username
     fi
 
+}
+
+function zip_secrets() {
+    zip -r /root/secrets.zip /opt/nimiq/validator/secrets &>/dev/null
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}File /root/secrets.zip created successfully.${NC}"
+    else
+        echo "Failed to create file /root/secrets.zip."
+    fi
 }
 
 # Function to set up a full node
@@ -198,15 +209,12 @@ function setup_validator_node() {
         cp "${config_dir}/nginx.conf" "${work_dir}/nginx.conf"
     fi
 
-    # Copy generated keys to the working directory
-    cp -r "${config_dir}/gen_keys" "${work_dir}/gen_keys"
+    # Create the secrets directory
     mkdir -p "${work_dir}/secrets"
 
     # Generate the validator key if it doesn't exist
-    cd "${work_dir}/gen_keys"
-    docker build -t nimiq-key-generator . &>/dev/null
-    docker run --rm -v "${work_dir}/secrets:/keys" -u 0 nimiq-key-generator &>/dev/null
-
+    docker run --rm -v "${work_dir}/secrets:/keys" -u 0 ${GEN_KEYS_DOCKER_IMAGE} &>/dev/null
+    
     # Define file paths for the keys
     local address="${work_dir}/secrets/address.txt"
     local fee_key="${work_dir}/secrets/fee_key.txt"
@@ -223,13 +231,13 @@ function setup_validator_node() {
 
     # Update client.toml
     sed -i "s/CHANGE_VALIDATOR_ADDRESS/$ADDRESS/g" $configuration_file
-    sed -i "s/CHANGE_FEE_KEY/$FEE_KEY/g" $configuration_file
+    sed -i "s/CHANGE_FEE_KEY/$ADDRESS_PRIVATE/g" $configuration_file
     sed -i "s/CHANGE_SIGN_KEY/$SIGNING_KEY/g" $configuration_file
     sed -i "s/CHANGE_VOTE_KEY/$VOTING_KEY/g" $configuration_file
 
-
-    # Copy validator activator script to the working directory
-    cp -r "${config_dir}/activate_validator" "${work_dir}/activate_validator"
+    # Zipping secrets
+    echo -e "${GREEN}Zipping secrets...${NC}"
+    zip_secrets 
 
     # Copy Docker-compose file and other necessary files
     cp "${config_dir}/Docker-compose.yaml" "${work_dir}/docker-compose.yaml"
@@ -243,7 +251,6 @@ function setup_validator_node() {
 
     echo -e "${GREEN}Nimiq Validator Node setup complete.${NC}"
 }
-
 
 # Function to install and configure monitoring tools
 function setup_monitoring() {
@@ -273,7 +280,7 @@ function setup_monitoring() {
 
     echo -e "${GREEN}Monitoring setup completed successfully.${NC}"
     echo -e "${GREEN}Wait few seconds before grafana is ready${NC}"
-    sleep 5
+    sleep 15
     echo -e "${GREEN}Monitoring setup completed successfully.${NC}"
     echo -e "${YELLOW}Login with Username: admin and Password: nimiq.${NC}"
     echo -e "${YELLOW}Change password to a secure password!${NC}"
