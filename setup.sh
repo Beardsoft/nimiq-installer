@@ -10,7 +10,7 @@ protocol_uid=1001
 network=${1:-testnet}
 node_type=${2:-validator}
 monitor=${3:-true} 
-version=${4:-improvements}  # Specify branch or tag if needed
+version=${4:-master}  # Specify branch or tag if needed
 
 GEN_KEYS_DOCKER_IMAGE="ghcr.io/maestroi/nimiq-key-generator:main"
 
@@ -115,7 +115,7 @@ function setup_user() {
 function zip_secrets() {
     zip -r /root/secrets.zip /opt/nimiq/validator/secrets &>/dev/null
     if [ $? -eq 0 ]; then
-        echo "File /root/secrets.zip created successfully."
+        echo -e "${GREEN}File /root/secrets.zip created successfully.${NC}"
     else
         echo "Failed to create file /root/secrets.zip."
     fi
