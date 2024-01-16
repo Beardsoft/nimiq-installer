@@ -237,7 +237,7 @@ function setup_validator_node() {
 
     # Zipping secrets
     echo -e "${GREEN}Zipping secrets...${NC}"
-    zip_secrets
+    zip_secrets &>/dev/null
 
     # Copy Docker-compose file and other necessary files
     cp "${config_dir}/Docker-compose.yaml" "${work_dir}/docker-compose.yaml"
