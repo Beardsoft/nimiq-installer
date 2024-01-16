@@ -45,7 +45,7 @@ services:
 
   activate_validator:
     container_name: activate_validator
-    image: ghcr.io/maestroi/nimiq-validator-activator:main
+    image: maestroi/nimiq-validator-activator:latest
     volumes:
       - "/opt/nimiq/validator/secrets:/keys"
     ports:
