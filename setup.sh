@@ -238,9 +238,6 @@ function setup_validator_node() {
     sed -i "s/CHANGE_SIGN_KEY/$SIGNING_KEY/g" $configuration_file
     sed -i "s/CHANGE_VOTE_KEY/$VOTING_KEY/g" $configuration_file
 
-    # Copy validator activator script to the working directory
-    cp -r "${config_dir}/activate_validator" "${work_dir}/activate_validator"
-
     # Copy Docker-compose file and other necessary files
     cp "${config_dir}/Docker-compose.yaml" "${work_dir}/docker-compose.yaml"
 
@@ -253,7 +250,6 @@ function setup_validator_node() {
 
     echo -e "${GREEN}Nimiq Validator Node setup complete.${NC}"
 }
-
 
 # Function to install and configure monitoring tools
 function setup_monitoring() {
