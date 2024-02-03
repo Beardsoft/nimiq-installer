@@ -13,13 +13,13 @@ These are based on testnet requirements early on, disk might need be bigger late
 - CPU: 2 core
 - Memory: 2 GB
 - Disk: 40 GB SSD
-- OS: Ubuntu 20.04+
+- OS: Ubuntu 22.04+
 
 ## Recommended
 - CPU: 2 core
 - Memory: 4 GB
 - Disk: 80 GB SSD
-- OS: Ubuntu 20.04+
+- OS: Ubuntu 22.04+
 
 # Oneliner
 Be aware executing things directly in terminal as root, check the files first!
