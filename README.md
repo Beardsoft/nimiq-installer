@@ -10,15 +10,15 @@ Mainnet is not yet available!
 These are based on testnet requirements early on, disk might need be bigger later!
 
 ## Minimum
-- CPU: 1 core
-- Memory: 1 GB
-- Disk: 20 GB HDD/SSD
+- CPU: 2 core
+- Memory: 2 GB
+- Disk: 40 GB SSD
 - OS: Ubuntu 20.04+
 
 ## Recommended
 - CPU: 2 core
 - Memory: 4 GB
-- Disk: 80 GB HDD/SSD
+- Disk: 80 GB SSD
 - OS: Ubuntu 20.04+
 
 # Oneliner
