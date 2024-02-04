@@ -63,6 +63,7 @@ services:
     image: ghcr.io/maestroi/nimiq-watchdog:main
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes/validator_data/_data/:/data/
     ports:
       - 12345:12345
     environment:
@@ -72,6 +73,10 @@ services:
       - RETRY_DELAY=10
       - RESTART_DELAY=300
       - DOCKER_CONTAINER_NAME=node
+      - PROMETHEUS_PORT=12345
+      - CLEAN_LEDGER=True
+      - LEDGER_DIR=/data/
+      - NODE_TYPE=full
     restart: unless-stopped
     networks:
       - app_net
