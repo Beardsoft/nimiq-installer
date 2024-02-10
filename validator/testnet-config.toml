@@ -11,8 +11,6 @@ seed_nodes = [
 [consensus]
 sync_mode = "full"
 network = "test-albatross"
-min_peers = 1
-desired_peer_count = 11
 
 [zkp]
 
