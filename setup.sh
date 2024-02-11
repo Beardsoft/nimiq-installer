@@ -66,6 +66,9 @@ function setup_firewall() {
     # Allow SSH
     ufw allow 22/tcp &>/dev/null
 
+    # Allow HTTP traffic
+    ufw allow 80/tcp &>/dev/null
+
     # Allow nimiq traffic
     ufw allow 8443/tcp &>/dev/null
 
