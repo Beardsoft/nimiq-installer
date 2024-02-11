@@ -18,6 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 3,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -75,7 +76,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 3,
         "w": 2,
         "x": 0,
         "y": 1
@@ -766,9 +767,9 @@
             "uid": "PBFA97CFB590B2093"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
+          "editorMode": "code",
           "exemplar": false,
-          "expr": "nimiq_validator_active",
+          "expr": "nimiq_validator_activated{}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": true,
@@ -841,9 +842,9 @@
             "uid": "PBFA97CFB590B2093"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
+          "editorMode": "code",
           "exemplar": false,
-          "expr": "nimiq_activated_amount",
+          "expr": "nimiq_validator_activated_counter",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": true,
@@ -929,6 +930,94 @@
         }
       ],
       "title": "Restart attempts",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "description": "If Jailed takes 8 epochs to be able to reactivate!",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Safe"
+                },
+                "1": {
+                  "color": "dark-red",
+                  "index": 1,
+                  "text": "JAILED"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "locale",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 2,
+        "x": 0,
+        "y": 4
+      },
+      "id": 47,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "nimiq_validator_jailed",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Validator Jailed",
       "type": "stat"
     },
     {
@@ -1237,7 +1326,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "nimiq_activated_amount{}",
+          "expr": "nimiq_validator_activated{}",
           "instant": true,
           "legendFormat": "{{address}}",
           "range": false,
@@ -1292,10 +1381,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
+        "h": 2,
         "w": 2,
         "x": 0,
-        "y": 5
+        "y": 6
       },
       "id": 27,
       "options": {
@@ -1396,7 +1485,7 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 3,
+        "w": 2,
         "x": 0,
         "y": 9
       },
@@ -1425,9 +1514,9 @@
             "uid": "PBFA97CFB590B2093"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
+          "editorMode": "code",
           "exemplar": false,
-          "expr": "nimiq_validator_active",
+          "expr": "nimiq_validator_activated",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": true,
@@ -1468,8 +1557,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 3,
-        "x": 3,
+        "w": 5,
+        "x": 2,
         "y": 9
       },
       "id": 24,
@@ -1499,7 +1588,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "nimiq_current_balance",
+          "expr": "nimiq_validator_balance / 100000",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": true,
@@ -1540,8 +1629,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 6,
-        "x": 6,
+        "w": 4,
+        "x": 7,
         "y": 9
       },
       "id": 32,
@@ -1571,7 +1660,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "nimiq_validator_current_stakers",
+          "expr": "nimiq_validator_num_stakers",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": true,
@@ -1613,7 +1702,7 @@
       "gridPos": {
         "h": 3,
         "w": 5,
-        "x": 12,
+        "x": 11,
         "y": 9
       },
       "id": 35,
@@ -1643,7 +1732,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "nimiq_validator_total_stake",
+          "expr": "nimiq_validator_stake_balance_luna / 100000",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": true,
@@ -1654,6 +1743,94 @@
         }
       ],
       "title": "Validator stake",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "description": "If Jailed takes 8 epochs to be able to reactivate!",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Safe"
+                },
+                "1": {
+                  "color": "dark-red",
+                  "index": 1,
+                  "text": "JAILED"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "locale",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 2,
+        "x": 0,
+        "y": 12
+      },
+      "id": 45,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "nimiq_validator_jailed",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Validator Jailed",
       "type": "stat"
     },
     {
@@ -1715,9 +1892,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 12,
         "w": 6,
-        "x": 0,
+        "x": 2,
         "y": 12
       },
       "id": 34,
@@ -1743,7 +1920,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "nimiq_current_balance",
+          "expr": "nimiq_validator_balance / 100000",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1814,9 +1991,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 12,
         "w": 6,
-        "x": 6,
+        "x": 8,
         "y": 12
       },
       "id": 36,
@@ -1842,7 +2019,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "nimiq_validator_current_stakers",
+          "expr": "nimiq_validator_num_stakers",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1914,9 +2091,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
-        "w": 5,
-        "x": 12,
+        "h": 12,
+        "w": 6,
+        "x": 14,
         "y": 12
       },
       "id": 33,
@@ -1942,11 +2119,11 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "nimiq_validator_total_stake",
+          "expr": "nimiq_validator_stake_balance_luna / 100000",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "Stakers history",
+          "legendFormat": "Stake history",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -1956,12 +2133,264 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "description": "If Jailed takes 8 epochs to be able to reactivate!",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Safe"
+                },
+                "1": {
+                  "color": "dark-red",
+                  "index": 1,
+                  "text": "Retired"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "locale",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 2,
+        "x": 0,
+        "y": 15
+      },
+      "id": 48,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "nimiq_validator_retired",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Validator Retired",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "description": "How many times reactivated",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Safe"
+                },
+                "1": {
+                  "color": "dark-red",
+                  "index": 1,
+                  "text": "JAILED"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "locale",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 2,
+        "x": 0,
+        "y": 18
+      },
+      "id": 46,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "nimiq_validator_reactivated_counter",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Reactivation counter",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "description": "If Jailed takes 8 epochs to be able to reactivate!",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "dark-red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "locale",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 2,
+        "x": 0,
+        "y": 21
+      },
+      "id": 44,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "nimiq_validator_jailed_from",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Block number jailed from.",
+      "type": "stat"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 21
+        "y": 24
       },
       "id": 5,
       "panels": [],
@@ -2032,7 +2461,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 22
+        "y": 25
       },
       "id": 2,
       "options": {
@@ -2132,7 +2561,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 22
+        "y": 25
       },
       "id": 8,
       "options": {
@@ -2232,7 +2661,7 @@
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 22
+        "y": 25
       },
       "id": 12,
       "options": {
@@ -2333,7 +2762,7 @@
         "h": 8,
         "w": 6,
         "x": 18,
-        "y": 22
+        "y": 25
       },
       "id": 11,
       "options": {
@@ -2375,7 +2804,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 30
+        "y": 33
       },
       "id": 39,
       "panels": [],
@@ -2414,7 +2843,7 @@
         "h": 7,
         "w": 9,
         "x": 0,
-        "y": 31
+        "y": 34
       },
       "id": 42,
       "options": {
@@ -2489,7 +2918,7 @@
         "h": 7,
         "w": 9,
         "x": 9,
-        "y": 31
+        "y": 34
       },
       "id": 43,
       "options": {
@@ -2596,7 +3025,7 @@
         "h": 11,
         "w": 9,
         "x": 0,
-        "y": 38
+        "y": 41
       },
       "id": 38,
       "options": {
@@ -2697,7 +3126,7 @@
         "h": 11,
         "w": 9,
         "x": 9,
-        "y": 38
+        "y": 41
       },
       "id": 41,
       "options": {
@@ -2740,7 +3169,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 85
+        "y": 52
       },
       "id": 19,
       "panels": [],
@@ -2756,7 +3185,7 @@
         "h": 20,
         "w": 15,
         "x": 0,
-        "y": 86
+        "y": 53
       },
       "id": 18,
       "options": {
@@ -2793,7 +3222,7 @@
         "h": 11,
         "w": 9,
         "x": 15,
-        "y": 86
+        "y": 53
       },
       "id": 23,
       "options": {
@@ -2831,7 +3260,7 @@
         "h": 9,
         "w": 9,
         "x": 15,
-        "y": 97
+        "y": 64
       },
       "id": 28,
       "options": {
@@ -2874,7 +3303,7 @@
   "timepicker": {},
   "timezone": "",
   "title": "Nimiq",
-  "uid": "c6bc62cc-84a6-49a3-842a-d0a336b1bc90",
-  "version": 1,
+  "uid": "fb6db08f-251a-430a-91e5-7b7bcadfb021",
+  "version": 4,
   "weekStart": ""
 }
