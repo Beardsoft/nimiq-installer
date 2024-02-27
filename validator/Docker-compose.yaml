@@ -46,6 +46,11 @@ services:
   activate_validator:
     container_name: activate_validator
     image: ghcr.io/maestroi/nimiq-validator-activator-go:main
+    environment:
+      - NIMIQ_NODE_URL=http://node:8648
+      - PROMETHEUS_PORT=8000
+      - FAUCET_URL=https://faucet.pos.nimiq-testnet.com/tapit
+      - NIMIQ_NETWORK=testnet
     volumes:
       - "/opt/nimiq/validator/secrets:/keys"
     ports:
