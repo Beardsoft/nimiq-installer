@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   node:
@@ -21,7 +21,7 @@ services:
       driver: json-file
       options:
         max-size: "10m"
-        max-file: "3" 
+        max-file: "3"
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -38,7 +38,7 @@ services:
       driver: json-file
       options:
         max-size: "10m"
-        max-file: "3" 
+        max-file: "3"
 
   watchdog:
     container_name: nimiq-watchdog
@@ -50,9 +50,9 @@ services:
     environment:
       - NIMIQ_HOST=http://node
       - NIMIQ_PORT=8648
-      - RETRY_LIMIT=10
-      - RETRY_DELAY=10
-      - RESTART_DELAY=300
+      - RETRY_LIMIT=60
+      - RETRY_DELAY=15
+      - RESTART_DELAY=600
       - DOCKER_CONTAINER_NAME=node
     restart: unless-stopped
     networks:
@@ -61,7 +61,7 @@ services:
       driver: json-file
       options:
         max-size: "10m"
-        max-file: "3" 
+        max-file: "3"
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -79,7 +79,7 @@ services:
       driver: json-file
       options:
         max-size: "10m"
-        max-file: "3" 
+        max-file: "3"
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
