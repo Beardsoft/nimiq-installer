@@ -7,6 +7,7 @@ listen_addresses = [
 seed_nodes = [
         { address = "/dns4/seed1.pos.nimiq-testnet.com/tcp/8443/wss" }
 ]
+desired_peer_count = 11
 
 [consensus]
 sync_mode = "full"
