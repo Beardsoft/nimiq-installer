@@ -55,7 +55,7 @@ function validate_inputs() {
         exit 1
     fi
 
-    if [[ $node_type != "full_node" && $node_type != "validator" ]]; then
+    if [[ $node_type != "full_node" && $node_type != "history_node" && $node_type != "validator" ]]; then
         echo -e "${RED}Invalid node_type parameter. Please use 'full_node' or 'validator'.${NC}"
         exit 1
     fi
