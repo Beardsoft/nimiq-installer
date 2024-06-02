@@ -367,10 +367,12 @@ function main() {
 
     if [ "$node_type" == "full_node" ]; then
         setup_full_node
+    elif [ "$node_type" == "history_node" ]; then
+        setup_history_node
     elif [ "$node_type" == "validator" ]; then
         setup_validator_node
     else
-        echo -e "${RED}Invalid node_type parameter. Please use 'full_node' or 'validator'.${NC}"
+        echo -e "${RED}Invalid node_type parameter. Please use 'full_node', 'history_node' or 'validator'.${NC}"
         exit 1
     fi
 
