@@ -55,7 +55,7 @@ function validate_inputs() {
         exit 1
     fi
 
-    if [[ $node_type != "full_node" && $node_type != "validator" ]]; then
+    if [[ $node_type != "full_node" && $node_type != "history_node" && $node_type != "validator" ]]; then
         echo -e "${RED}Invalid node_type parameter. Please use 'full_node' or 'validator'.${NC}"
         exit 1
     fi
@@ -79,7 +79,16 @@ function setup_firewall() {
 function install_docker() {
     echo -e "${GREEN}Installing Docker...${NC}"
     apt-get update &>/dev/null
-    apt-get install -y docker.io docker-compose python3 python3-pip &>/dev/null
+    apt-get install -y ca-certificates curl &>/dev/null
+    install -m 0755 -d /etc/apt/keyrings &>/dev/null
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc &>/dev/null
+    chmod a+r /etc/apt/keyrings/docker.asc &>/dev/null
+    echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update &>/dev/null
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin &>/dev/null
     docker network create app_net &>/dev/null
     if ! id -nG $username | grep -qw docker; then
         echo -e "${GREEN}Adding user $username to the docker group.${NC}"
@@ -171,9 +180,61 @@ function setup_full_node() {
     ufw allow 80/tcp &>/dev/null
     ufw allow 443/tcp &>/dev/null
 
-    docker-compose up -d &>/dev/null
+    docker compose up -d &>/dev/null
 
     echo -e "${GREEN}Nimiq Full Node setup complete.${NC}"
+}
+
+# Function to set up a full node
+function setup_history_node() {
+    echo -e "${GREEN}Setting up Nimiq Full Node...${NC}"
+
+    # Define the configuration directory
+    local config_dir="$REPO_DIR/history_node"
+
+    # Navigate to the configuration directory
+    cd $config_dir
+
+    # Check if the network configuration file exists
+    local config_file
+    if [ "$network" == "testnet" ]; then
+        config_file="${config_dir}/testnet-config.toml"
+    elif [ "$network" == "mainnet" ]; then
+        config_file="${config_dir}/mainnet-config.toml"
+    else
+        echo -e "${RED}Invalid network parameter. Only 'testnet' and 'mainnet' are supported.${NC}"
+        exit 1
+    fi
+
+    if [ ! -f "$config_file" ]; then
+        echo -e "${RED}Configuration file for $network not found.${NC}"
+        exit 1
+    fi
+
+    # Copy the configuration file to a working directory
+    local work_dir="/opt/nimiq/history_node"
+    mkdir -p $work_dir
+    cp $config_file "${work_dir}/client.toml"
+
+    # Copy Docker-compose file
+    cp "${config_dir}/Docker-compose.yaml" "${work_dir}/docker-compose.yaml"
+
+    # Copy Nginx configuration file if it exists
+    if [ -f "${config_dir}/nginx.conf" ]; then
+        cp "${config_dir}/nginx.conf" "${work_dir}/nginx.conf"
+    fi
+
+    # Navigate to the working directory and start the Docker container
+    cd $work_dir
+    echo -e "${GREEN}Starting the Nimiq History Node Docker container...${NC}"
+
+    # Allow HTTP and HTTPS traffic
+    ufw allow 80/tcp &>/dev/null
+    ufw allow 443/tcp &>/dev/null
+
+    docker compose up -d &>/dev/null
+
+    echo -e "${GREEN}Nimiq History Node setup complete.${NC}"
 }
 
 # Function to set up a validator node
@@ -250,7 +311,7 @@ function setup_validator_node() {
 
     # Start the Docker container
     echo -e "${GREEN}Starting the Nimiq Validator Node Docker container...${NC}"
-    docker-compose up -d &>/dev/null
+    docker compose up -d &>/dev/null
 
     echo -e "${GREEN}Nimiq Validator Node setup complete.${NC}"
 }
@@ -279,7 +340,7 @@ function setup_monitoring() {
 
     # Navigate to the target monitoring directory and start the services
     cd $monitor_target_dir
-    docker-compose up -d &>/dev/null
+    docker compose up -d &>/dev/null
 
     echo -e "${GREEN}Monitoring setup completed successfully.${NC}"
     echo -e "${GREEN}Wait few seconds before grafana is ready${NC}"
@@ -306,10 +367,12 @@ function main() {
 
     if [ "$node_type" == "full_node" ]; then
         setup_full_node
+    elif [ "$node_type" == "history_node" ]; then
+        setup_history_node
     elif [ "$node_type" == "validator" ]; then
         setup_validator_node
     else
-        echo -e "${RED}Invalid node_type parameter. Please use 'full_node' or 'validator'.${NC}"
+        echo -e "${RED}Invalid node_type parameter. Please use 'full_node', 'history_node' or 'validator'.${NC}"
         exit 1
     fi
 
