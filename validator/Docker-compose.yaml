@@ -3,7 +3,7 @@ version: "3"
 services:
   node:
     container_name: node
-    image: ghcr.io/nimiq/core-rs-albatross:v0.23.0
+    image: ghcr.io/nimiq/core-rs-albatross:v0.24.0
     user: "1001:1001"
     restart: unless-stopped
     ports:
@@ -60,7 +60,7 @@ services:
 
   activate_validator:
     container_name: activate_validator
-    image: ghcr.io/maestroi/nimiq-validator-activator-go:main
+    image: ghcr.io/beardsoft/nimiq-validator-activator-go:main
     environment:
       - NIMIQ_NODE_URL=http://node:8648
       - PROMETHEUS_PORT=8000
@@ -85,7 +85,7 @@ services:
 
   watchdog:
     container_name: nimiq-watchdog
-    image: ghcr.io/maestroi/nimiq-watchdog:main
+    image: ghcr.io/beardsoft/nimiq-watchdog:main
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes/validator_data/_data/:/data/
