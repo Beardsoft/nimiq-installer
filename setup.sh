@@ -12,7 +12,7 @@ node_type=${2:-validator}
 monitor=${3:-true} 
 version=${4:-master}  # Specify branch or tag if needed
 
-GEN_KEYS_DOCKER_IMAGE="ghcr.io/Beardsoft/nimiq-key-generator:main"
+GEN_KEYS_DOCKER_IMAGE="ghcr.io/beardsoft/nimiq-key-generator:main"
 
 # Colors for output
 GREEN='\033[0;32m'
