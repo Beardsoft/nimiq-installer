@@ -3,7 +3,7 @@ version: "3"
 services:
   node:
     container_name: node
-    image: ghcr.io/nimiq/core-rs-albatross:v0.23.0
+    image: ghcr.io/nimiq/core-rs-albatross:v0.24.0
     user: "1001:1001"
     restart: unless-stopped
     ports:
@@ -42,7 +42,7 @@ services:
 
   watchdog:
     container_name: nimiq-watchdog
-    image: ghcr.io/maestroi/nimiq-watchdog:main
+    image: ghcr.io/beardsoft/nimiq-watchdog:main
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
