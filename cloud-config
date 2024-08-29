@@ -1,6 +1,0 @@
-#cloud-config
-
-runcmd:
-  - curl -fsSL https://raw.githubusercontent.com/maestroi/nimiq-installer/master/install_protocol.sh -o install_protocol.sh
-  - chmod +x install_protocol.sh
-  - sudo ./install_protocol.sh testnet validator master
