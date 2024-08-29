@@ -3,7 +3,7 @@
 # Improved Nimiq V2 Installer with Repository Cloning and Monitoring
 
 # Set default values
-REPO_URL="https://github.com/maestroi/nimiq-installer.git"
+REPO_URL="https://github.com/Beardsoft/nimiq-installer.git"
 REPO_DIR="/opt/nimiq-installer"
 username="protocol"
 protocol_uid=1001
@@ -12,7 +12,7 @@ node_type=${2:-validator}
 monitor=${3:-true} 
 version=${4:-master}  # Specify branch or tag if needed
 
-GEN_KEYS_DOCKER_IMAGE="ghcr.io/maestroi/nimiq-key-generator:main"
+GEN_KEYS_DOCKER_IMAGE="ghcr.io/Beardsoft/nimiq-key-generator:main"
 
 # Colors for output
 GREEN='\033[0;32m'
