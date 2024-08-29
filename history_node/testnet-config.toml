@@ -13,18 +13,6 @@ desired_peer_count = 11
 sync_mode = "history"
 network = "test-albatross"
 
-[zkp]
-
-# Specify the proof generation capabilities.
-
-# Defines if the proof generation is active
-# Default: false
-# prover_active = true
-
-# Defines the path for the proving and verifying keys folders
-# Default: ".zkp"
-prover_keys_path = "/home/nimiq/.zkp/"
-
 [rpc-server]
 # Bind the RPC server to specified IP
 # Default: 127.0.0.1
